@@ -1,26 +1,39 @@
 ---
 title: "Black Friday"
-author: "Weicheng Zhang, Zilei Zhang, Maura Oray"
+author: "Weicheng Zhang, Zilei Zhang, Maura"
 date: "9/24/2018"
 output: html_document
 ---
-# 1. Introduction 
+# Introduction 
 The dataset here is a sample of the transactions made in a retail store during "Black Friday". The store wants to know better about the customer purchase behaviour against different products which is useful for them to make the purchasing decision for the next year. 
 
-In this project, we want to: (1)predict the age of the consumer and their targeted goods, (2)figure out the relationship between different categories of goods bought. This dataset is also particularly convenient for clustering and maybe (3)find different clusters of consumers within it.
+In this project, we want to: (1)predict the age of the consumer and their targeted goods, (2)figure out the relationship between different category of goods bought. This dataset is also particularly convenient for clustering and maybe (3)find different clusters of consumers within it.
 
 The dataset comes from a competition hosted by Analytics Vidhya.
 
-# 2. Data Description
+# Data Description
 ```{r, echo=TRUE, message=TRUE, warning=FALSE}
+BF_sum = BF%>%
+  group_by(User_ID)%>%
+  mutate(sumP = sum(Purchase))
+BF_sum = BF_sum[-c(2)]
+BF_sum = BF_sum[-c(8:11)]
+BF_sum[!duplicated(BF_sum$User_ID), ]
+  
+
 # Data Cleaning
 library(readr)
 library(tidyverse)
-setwd("~/Desktop/BUS-256/Marketing Analytics Project")
-BF<- read_csv("BlackFriday.csv")
+setwd("~/Desktop")
+BF<- read_csv("BlackFriday copy.csv")
 summary(BF)
 ## Change the computer data-types of the variables
-
+install.packages('questionr')
+library(questionr)
+two_way <- data.frame(wtd.table(x = BF$Marital_Status, y=BF$Gender))
+names(two_way)[1]<-'Marry'
+names(two_way)[2]<-'Gender'
+two_way
 ## Deal with missing data
 install.packages("VIM")
 library('VIM')
@@ -38,11 +51,10 @@ BF_age1 = BF %>%
             sumgoods2 = sum(Product_Category_2, na.rm = TRUE),
             sumgoods3 = sum(Product_Category_3, na.rm = TRUE))
 
-##Clean and prepare data, change certain variables to factors
-
-BF[3:11] <- lapply(BF[3:11], factor)
   
 ```
+<<<<<<< Updated upstream
+=======
 a. Conceptual measure types
 
 The data set includes the following variables: User_ID (discrete), Product_ID (discrete), Gender (discrete), Age (discrete), Occupation (discrete), City_Category (discrete), Stay_in_Current_City_Years (continuous), Marital_Status (discrete), Product_Category_1 (discrete), Product_Category_2 (discrete), Product_Category_3 (discrete), and finally Purchase (continuous). 
@@ -55,3 +67,11 @@ We first wanted to view the different variable types in our data set, and saw th
 #Summary Statistics
 ```
 Note: Boxplots - can do M-F, age categories
+
+BF_sum = BF%>%
+  group_by(User_ID)%>%
+  mutate(sumP = sum(Purchase))
+BF_sum = BF_sum[-c(2)]
+BF_sum = BF_sum[-c(8:11)]
+BF_sum[!duplicated(BF_sum$User_ID), ]
+>>>>>>> Stashed changes
