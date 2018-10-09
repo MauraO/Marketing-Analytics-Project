@@ -14,7 +14,6 @@ The dataset comes from a competition hosted by Analytics Vidhya.
 Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
 
 ```{r}
-
 #2.Data Description
 
 library(readr)
@@ -25,39 +24,33 @@ library(dplyr)
 
 BF <- read_csv("~/Desktop/BUS-256/Marketing Analytics Project/BlackFriday.csv")
 
-#Change variable types
+#Changing variable types
 
-two_way <- data.frame(wtd.table(x = BF$Marital_Status, y=BF$Gender))
-names(two_way)[1]<-'Marry'
-names(two_way)[2]<-'Gender'
-two_way
+BF[3:8] = lapply(BF[3:8], factor)
 
 #Missing data
 
-sum(complete.cases(BF))
+sum(complete.cases(BF)) #There are 164,278 NA values in the dataset
 aggr(BF,cex.axis = .4)
-### Only product category_2 and product category_3 have missing data. It is ok, for individual will not buy all categories. 
+BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #Replace NA values in category 2 with zero, indicating that there is no category 2 in that row
+BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #Replace NA values in category 3 with zero, indicating that there is no category 3 in that row
+```
+a. Conceptual measure types
+The data set includes the following variables: User_ID (discrete), Product_ID (discrete), Gender (discrete), Age (discrete), Occupation (discrete), City_Category (discrete), Stay_in_Current_City_Years (continuous), Marital_Status (discrete), Product_Category_1 (discrete), Product_Category_2 (discrete), Product_Category_3 (discrete), and finally Purchase (continuous). 
 
-## filter and select variables
+b. Data Cleaning
+We first wanted to view the different variable types in our data set, and saw that we had only integers and characters. However, we wanted to change the majority of the variables into factors in order to better analyze the data. Since many of the variables are categorical (for example, age is broken down into categories) factors allow us to properly identify and categorize these variables. 
+
+We also decided to check how many NA values we had. There were 164,278 NA values, representing about 31% of the data set. Since the NA values only occured in the variables Product Category 2 and 3, we decided to replace the NA values with "0" to indicate that a customer only purchased an item in Product Category 1. This intuitively makes sense as customers need not purchase a product in categories 2 or 3. 
+```{r}
+#3. Summary Statistics and Data Visualizations
+
+#filter and select variables
 BF_age1 = BF %>%
   group_by(Age) %>%
   summarize(sumgoods1 = sum(Product_Category_1),
             sumgoods2 = sum(Product_Category_2, na.rm = TRUE),
             sumgoods3 = sum(Product_Category_3, na.rm = TRUE))
-
-  
-```
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-a. Conceptual measure types
-
-The data set includes the following variables: User_ID (discrete), Product_ID (discrete), Gender (discrete), Age (discrete), Occupation (discrete), City_Category (discrete), Stay_in_Current_City_Years (continuous), Marital_Status (discrete), Product_Category_1 (discrete), Product_Category_2 (discrete), Product_Category_3 (discrete), and finally Purchase (continuous). 
-
-b. Data Cleaning
-
-We first wanted to view the different variable types in our data set, and saw that we had only integers and characters. However, we wanted to change the majority of the variables into factors in order to better analyze the data. For example, we believe that it makes more sense to have "Age" as a factor instead of as a character. **Explain why!!
-```{r}
 
 #Summary Statistics
 ```
@@ -72,3 +65,8 @@ BF_sum[!duplicated(BF_sum$User_ID), ]
 >>>>>>> Stashed changes
 =======
 >>>>>>> 1ced2d625b7fa78cf08869dba27484870485b3fb
+
+two_way <- data.frame(wtd.table(x = BF$Marital_Status, y=BF$Gender))
+names(two_way)[1]<-'Marry'
+names(two_way)[2]<-'Gender'
+two_way
