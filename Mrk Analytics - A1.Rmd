@@ -4,7 +4,7 @@ author: "Weicheng Zhang, Zilei Zhang, Maura Oray, Gloria Zheng"
 date: "9/24/2018"
 output: html_document
 ---
-# Introduction 
+#1. Introduction 
 The dataset here is a sample of the transactions made in a retail store during "Black Friday". The store wants to know better about the customer purchase behaviour against different products which is useful for them to make the purchasing decision for the next year. 
 
 In this project, we want to: (1)predict the age of the consumer and their targeted goods, (2)figure out the relationship between different category of goods bought. This dataset is also particularly convenient for clustering and maybe (3)find different clusters of consumers within it.
@@ -13,30 +13,27 @@ The dataset comes from a competition hosted by Analytics Vidhya.
 
 Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
 
-# Data Description
-```{r, echo=TRUE, message=TRUE, warning=FALSE}
+```{r}
 
+#2.Data Description
 
-
-# Data Cleaning
 library(readr)
 library(tidyverse)
-setwd("~/Desktop")
-BF<- read_csv("BlackFriday copy.csv")
-summary(BF)
-## Change the computer data-types of the variables
-install.packages('questionr')
 library(questionr)
+library(VIM)
+library(dplyr)
+
+BF <- read_csv("~/Desktop/BUS-256/Marketing Analytics Project/BlackFriday.csv")
+
+#Change variable types
+
 two_way <- data.frame(wtd.table(x = BF$Marital_Status, y=BF$Gender))
 names(two_way)[1]<-'Marry'
 names(two_way)[2]<-'Gender'
 two_way
-## Deal with missing data
-install.packages("VIM")
-library('VIM')
-library(dplyr)
-data(BF, package = "VIM")
-dim(BF)
+
+#Missing data
+
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4)
 ### Only product category_2 and product category_3 have missing data. It is ok, for individual will not buy all categories. 
@@ -50,6 +47,7 @@ BF_age1 = BF %>%
 
   
 ```
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 a. Conceptual measure types
@@ -72,3 +70,5 @@ BF_sum = BF_sum[-c(2)]
 BF_sum = BF_sum[-c(8:11)]
 BF_sum[!duplicated(BF_sum$User_ID), ]
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1ced2d625b7fa78cf08869dba27484870485b3fb
