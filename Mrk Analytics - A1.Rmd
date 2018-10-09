@@ -1,6 +1,6 @@
 ---
 title: "Black Friday"
-author: "Weicheng Zhang, Zilei Zhang, Maura"
+author: "Weicheng Zhang, Zilei Zhang, Maura Oray, Gloria Zheng"
 date: "9/24/2018"
 output: html_document
 ---
@@ -11,15 +11,12 @@ In this project, we want to: (1)predict the age of the consumer and their target
 
 The dataset comes from a competition hosted by Analytics Vidhya.
 
+Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
+
 # Data Description
 ```{r, echo=TRUE, message=TRUE, warning=FALSE}
-BF_sum = BF%>%
-  group_by(User_ID)%>%
-  mutate(sumP = sum(Purchase))
-BF_sum = BF_sum[-c(2)]
-BF_sum = BF_sum[-c(8:11)]
-BF_sum[!duplicated(BF_sum$User_ID), ]
-  
+
+
 
 # Data Cleaning
 library(readr)
