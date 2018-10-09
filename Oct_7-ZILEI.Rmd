@@ -1,0 +1,221 @@
+---
+title: "Marketing Project"
+author: "Maura, Weicheng Zhang, Zilei Zhang, Gloria Zhang"
+date: "10/1/2018"
+output: html_document
+---
+### 1. Introduction 
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+F_mode <- function(x)
+{
+return(as.numeric(names(table(x))[table(x) == max(table(x))]))
+}## create a mode function.
+```
+
+The dataset here is a sample of the transactions made in a retail store during "Black Friday". The store wants to know better about the customer purchase behaviour against different products which is useful for them to make the purchasing decision for the next year. 
+
+**In this project, we want to: (1)predict the age of the consumer and their targeted goods, (2)figure out the relationship between different category of goods bought. This dataset is also particularly convenient for clustering and maybe (3)find different clusters of consumers within it.**
+
+The dataset comes from a competition hosted by Analytics Vidhya.
+
+### 2. Data Description 
+
+a. Describe the “conceptual” measure types of the different variables in your data.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+setwd("~/Downloads/Brandeis Courses/Mrk-A1")
+library(readr)
+library(tidyverse)
+install.packages('ggthemes')
+library(ggthemes)
+BF<- read_csv("BlackFriday.csv")
+str(BF)
+
+```
+
+The data set includes the following variables: User_ID (discrete), Product_ID (discrete), Gender (discrete), Age (discrete), Occupation (discrete), City_Category (discrete), Stay_in_Current_City_Years (continuous), Marital_Status (discrete), Product_Category_1 (discrete), Product_Category_2 (discrete), Product_Category_3 (discrete), and finally Purchase (continuous).
+
+### b. Data Cleaning 
+
+Firstly, we want to know which variables have missing data
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+install.packages("VIM")
+library('VIM')
+library(dplyr)
+data(BF, package = "VIM")
+dim(BF)
+sum(complete.cases(BF))
+aggr(BF,cex.axis = .4)
+BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - means the category_2 is missing
+BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - means the category_3 is missing
+
+```
+
+From the plot making by the above code, we notice only product category_2 and product category_3 have missing data. We fill the missing data by 0 to represent that this product does not belong to category_2 or category_3. 
+
+Secondly, we want to view the different variable types in our data set, and see that we had only integers and characters. However, we want to change the majority of the variables into factors in order to better analyze the data. For example, we believe that it makes more sense to have "Age" as a factor instead of as a character. Because "Age" is a category instead of a continuous number and we want to use "Age" to divide several groups. 
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+BF$User_ID = as.factor(BF$User_ID)
+BF[3:8] = lapply(BF[3:8], factor)
+View(BF)
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# If we want to calculate average, this sheet will be used. 
+BF_sum = BF%>%
+  group_by(User_ID)%>%
+  mutate(sumP = sum(Purchase))
+BF_sum = BF_sum[-c(2)]
+BF_sum = BF_sum[-c(8:11)]
+BF_sum = BF_sum[!duplicated(BF_sum$User_ID), ]
+
+## number of male and female
+BF_sum%>%
+  ggplot(aes(x = Gender))+
+  geom_bar(aes(stat = 'identity'))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# What is the male and female customer's whole and average purchase? - summary table
+B1 = BF_sum %>%
+  group_by(Gender)%>%
+  summarise(sum_purchase = sum(sumP/1), avg_purchase = mean(sumP/1))
+kable(B1)
+```
+
+```{r}
+## What is the distribution of the purchase among different gender and maritual status? - Box plots
+## 
+BF_sum %>%
+  ggplot(aes(x = Gender, y = sumP, fill = Marital_Status))+
+  geom_boxplot()+
+  ggtitle('Distribution of maritual and gender')+
+  scale_fill_wsj()+
+  guides(fill=guide_legend(title=NULL)) 
+```
+
+***
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# What kind of customer do we need to encourage with flier discount - summary tables
+# Married male, whose age is among 46 to 50 and the occupation is 8 has the largest average purchase number. The store should 给他们个体更多的商品特价来增加个人的购买数量，提高store的收益
+Customer_1 = BF_sum %>%
+  group_by(Gender, Age, Occupation, Marital_Status)%>%
+  summarise(avg_p = mean(sumP))%>%
+  arrange(desc(avg_p))
+kable(Customer_1)
+
+# What kind of customer do we need to use recommended method to encourage 
+# Unmarried male, whose age is among 18 to 25 and the occupation is 4 has the largest sum purchase number. The store should 推荐朋友有折扣的方式对这个群体进行促销来增加整个群体的购买数量，提高store收益
+Customer_2 = BF_sum %>%
+  group_by(Gender, Age, Occupation, Marital_Status)%>%
+  summarise(sum_p = sum(sumP))%>%
+  arrange(desc(sum_p))
+kable(Customer_2)
+
+```
+
+***
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# In which city and how long of the year spent in it bought most? - scatter plots
+# In city A and stay no more than 1 year bought the most. \In city B and stay for 3 years should also be the targeted cutomer 
+City_1 = BF_sum %>%
+  group_by(City_Category,Stay_In_Current_City_Years )%>%
+  summarise(sum_p = sum(sumP), mean_p = mean(sumP))
+
+City_1%>%
+  ggplot(aes(x = City_Category, y = mean_p, col = Stay_In_Current_City_Years))+
+  geom_point(shape = 18, size = 3)
+```
+
+***
+
+** What’s the most popular product category?**
+The product category 1 has three most popular product: 5, 1 and 8 - Bar graphs
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+BF_prt = BF %>%
+  group_by(Product_ID) %>%
+  mutate(sumpp = sum(Purchase), avgpp = mean(Purchase))
+BF_prt = BF_prt[-c(3:8)]
+BF_prt%>%
+  ggplot(aes(x = Product_Category_1))+
+  geom_bar(aes(x = fct_infreq(as.factor(Product_Category_1))),fill = 'yellow')
+  
+```
+
+***
+
+### 3. Summary statistics and Data Visualizations
+
+This would describe the basic patterns in your CLEANED dataset. Specifically, apart from showing the code and resulting output, you should explain the following -
+
+a. Why did you select the variables (and summaries) that you chose?
+
+b. Why did you select the type of visualization for these variables? (Hint: Relate to the conceptual measure-types for these variables)
+
+c. How did you improve the graph from its initial ggplot2 output? (Hint: Specify some choices of aesthetics, facets or themes that helped improve the visualization of your plot)
+
+d. What question are you trying to answer with each summary table or visualization?
+
+e. What conclusion do you draw about the answer to your question?
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+
+```
+Summary statistics can include
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# a. One-way frequency tables 
+library(questionr)
+one_way <- data.frame(wtd.table(x = BF$Product_Category_2))
+names(one_way)[1]<-'Product Category 2'
+one_way
+
+# b. Two-way frequency tables 
+## which has the largest customer group: In C, stay for 1 year. 
+library(questionr)
+two_way <- data.frame(wtd.table(x = BF_sum$City_Category, y=BF_sum$Stay_In_Current_City_Years))
+names(two_way)[1]<-'City Category'
+names(two_way)[2]<-'Years'
+two_way
+
+# c. Summary tables 
+
+# d. Any other summary tables as appropriate
+
+```
+
+Visualizations can include
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#a. Histograms, bar-graphs, density plots
+
+#b. Box-plots
+
+#c. Scatter-plots, line-plots
+
+#d. Any other plots as appropriate
+```
+
+### 4. Preliminary statistical analyses 
+
+**做个回归，看看maritual gender age occupation 哪一个对purchase值有影响**
+– Using the takeaways from the previous part, comment which of the relationships are statistically significant. You can do this by performing –
+
+a. Hypothesis testing – t-tests (one-sample, two-sample), chi-squared tests, correlation tests
+
+b. Any other techniques as appropriate - 
+
+c. Again, you should relate this to the patterns found in the previous part, particularly
+
+1) Why did you select the variables that you chose?
+
+2) Why did you select the analysis technique for these variables? (Hint: Relate to the conceptual measure-types for these variables)
+
+3) What question are you trying to answer with these statistical analyses?
+
+4) What conclusion do you draw about the answer to your question? How does this relate to the overall project goal?
+
+### 5. Conclusion 
+
+Discuss what the data patterns indicate, how you might extend these analyses in the future, and what this could mean for your firm’s managers.

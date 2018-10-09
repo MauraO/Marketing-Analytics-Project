@@ -1,6 +1,10 @@
 ---
 title: "Black Friday"
+<<<<<<< HEAD
 author: "Weicheng Zhang, Zilei Zhang, Maura Oray, Gloria Zheng"
+=======
+author: "Weicheng Zhang, Zilei Zhang, Maura"
+>>>>>>> 1ced2d625b7fa78cf08869dba27484870485b3fb
 date: "9/24/2018"
 output: html_document
 ---
@@ -11,12 +15,24 @@ In this project, we want to: (1)predict the age of the consumer and their target
 
 The dataset comes from a competition hosted by Analytics Vidhya.
 
+<<<<<<< HEAD
 Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
 
 # Data Description
 ```{r, echo=TRUE, message=TRUE, warning=FALSE}
 
 
+=======
+# Data Description
+```{r, echo=TRUE, message=TRUE, warning=FALSE}
+BF_sum = BF%>%
+  group_by(User_ID)%>%
+  mutate(sumP = sum(Purchase))
+BF_sum = BF_sum[-c(2)]
+BF_sum = BF_sum[-c(8:11)]
+BF_sum[!duplicated(BF_sum$User_ID), ]
+  
+>>>>>>> 1ced2d625b7fa78cf08869dba27484870485b3fb
 
 # Data Cleaning
 library(readr)
@@ -50,6 +66,7 @@ BF_age1 = BF %>%
 
   
 ```
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 a. Conceptual measure types
@@ -72,3 +89,5 @@ BF_sum = BF_sum[-c(2)]
 BF_sum = BF_sum[-c(8:11)]
 BF_sum[!duplicated(BF_sum$User_ID), ]
 >>>>>>> Stashed changes
+=======
+>>>>>>> 1ced2d625b7fa78cf08869dba27484870485b3fb
