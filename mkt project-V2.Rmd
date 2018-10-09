@@ -1,0 +1,204 @@
+---
+title: "Marketing Anlytics Project"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+# Install and load all the packages we need
+library('VIM')
+library(readr)
+library(tidyverse)
+library(dplyr)
+```
+
+### 1. Introduction 
+
+#### Objective:
+* Look at the distribution of customers demographcis
+* Find how is purchase differed w.r.t. demographcis factors and test it
+* what kind of products are sold well and who is buying them (to be decided)
+
+### 2. Data Description
+
+#### a. Describe the conceptual measure types of the different variables
+```{r}
+BF =  read_csv("BlackFriday.csv")
+```
+
+* User_ID : discrete
+* Product_ID : discrete
+* Gender : discrete
+* Age : discrete
+* Occupation : discrete
+* City_Category : discrete
+* Stay_in_Current_City_Years : continuous
+* Marital_Status : discrete
+* Product_Category_1 : discrete
+* Product_Category_2 : discrete
+* Product_Category_3 : discrete
+* and finally Purchase :continuous
+
+#### b. Mention all the steps you took to clean the data
+
+##### Step 1. Check if the data contains missing values
+```{r}
+sum(complete.cases(BF))
+aggr(BF,cex.axis = .4)
+```
+
+##### Step 2. Check the structure of the data
+```{r message=FALSE, warning=FALSE}
+summary(BF)
+str(BF)
+```
+
+#### Step 3. Type coercion
+```{r}
+BF[1:11] = lapply(BF[1:11], factor)
+```
+
+#### Step 4. Tidy the data
+```{r}
+# Demographics data
+demo = BF %>% 
+  select(-starts_with("Product")) %>%
+  group_by(User_ID) %>%
+  mutate(Purchase = sum(Purchase))
+
+demo = demo[!duplicated(demo$User_ID), ]
+```
+
+
+> ### 3. Summary statistics and Data Visualizations  
+** Customer Demographics**  
+* The distribution of gender and maritial status  
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Two way frequency table showing different combination of customers using gender and marital status  
+customer = table(demo$Gender, demo$Marital_Status)
+colnames(customer) = c("Unmarried", "Married")
+rownames(customer) = c("Female", "Male")
+
+addmargins(customer)
+addmargins(prop.table(customer))
+
+```
+The two-way frequency table shows 4 combinations of customers. There are 5891 distinct customers in total, and 2470 of them are unmarried male; 1755 are married male; 947 are unmarried female; 719 are married female.  
+In this two-frequency table, we can figure out that there are more unmarried customers (58%) than the married (42%) and more male customers (72%) than the female (28%). Therefore, in the following analysis about gender and maritial status, we need to focus on their average purchase instead of the sum purchase, because the sum purchase will easily be influenced by the number of people, which may caused a biased conclusion.   
+
+** Distribution of purchase**
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+demo %>%
+  ggplot(aes(Purchase)) +
+  geom_histogram(col = "black", fill = "red1") +
+  scale_x_continuous(limits = c(0, 11000000)) +
+  theme_minimal() +
+  labs(x = "Purchase in dollar", y = "Number of customers", title = "Distribution of purchase")
+```
+
+** Purchase disttribution by gender and city**
+```{r message=FALSE, warning=FALSE}
+demo %>%
+  ggplot(aes(x = Purchase, fill = Gender)) +
+  geom_histogram() +
+  facet_grid(~City_Category) +
+  scale_x_continuous(limits = c(0, 3000000)) +
+  theme_minimal() +
+  labs(x = "Purchase in dollar", y = "Number of customers", title = "Purchase disttribution by gender and city")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.5))
+```
+
+** Purchase distribution by occupation**
+```{r}
+demo %>%
+  group_by(Occupation)%>%
+  ggplot(aes(x = fct_infreq(Occupation), y = sum(Purchase), fill = Marital_Status)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  coord_flip() +
+  labs(x = "Occupation", y = "Purchase in Dollar", title = "Purchase Distribution by Occupation")
+```
+
+** Purchase distribution by occupation**
+```{r}
+demo %>%
+  ggplot(aes(x = Age, y = Purchase)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "Age", y = "Purchase in Dollar", title = "Purchase Distribution by Age")
+```
+
+** Purchase distribution by occupation**
+```{r message=FALSE, warning=FALSE}
+demo %>%
+  ggplot(aes(x = Purchase, fill = Gender)) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0, 3000000)) +
+  theme_minimal() +
+  labs(x = "Purchase in dollar", y = "Number of customers", title = "Purchase disttribution by gender")
+```
+
+** Purchase distribution by occupation**
+```{r message=FALSE, warning=FALSE}
+demo %>%
+  ggplot(aes(x = Stay_In_Current_City_Years, y = Purchase)) +
+  geom_boxplot()+
+  theme_minimal() +
+  labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase distribution by stay years")
+```
+
+** What’s the most popular product category?**
+The product category 1 has three most popular product: 5, 1 and 8 - Bar graphs
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+BF_prt = BF %>%
+  group_by(Product_ID) %>%
+  mutate(sumpp = sum(Purchase), avgpp = mean(Purchase))
+BF_prt = BF_prt[-c(3:8)]
+BF_prt%>%
+  ggplot(aes(x = Product_Category_1))+
+  geom_bar(aes(x = fct_infreq(as.factor(Product_Category_1))),fill = 'paleturquoise1')
+  
+```
+
+### 4 Preliminary statistical analyses
+```{r}
+## Independent t test
+# Does men spend more money on Black Friday than women?
+t.test(demo[demo$Gender == "M", ]$Purchase,
+       demo[demo$Gender == "F", ]$Purchase,
+       paired = FALSE,
+       alternative = "greater")
+```
+
+```{r}
+## Independent t test
+# Does unmarried customers spend more money on Black Friday than the married?
+t.test(demo[demo$Marital_Status == 0, ]$Purchase,
+       demo[demo$Marital_Status == 1, ]$Purchase,
+       paired = FALSE,
+       alternative = "greater")
+```
+
+```{r}
+### Chi square test
+## Is there an association between age and purchase?
+
+# Creat purchase category
+demo = demo %>% 
+  mutate(purchase_category = cut(Purchase, breaks = c(-Inf, 234914, 512612, 1099005, Inf),
+                                        labels = c("low", "middle", "high", "very high")))
+
+# Creat two way frequency table
+table(demo$Age, demo$purchase_category)
+
+# Apply chi square test
+chisq.test(table(demo$Age, demo$purchase_category))
+
+```
+
