@@ -94,7 +94,7 @@ The two-way frequency table shows 4 combinations of customers. There are 5891 di
 
 In this two-way frequency table, we can deduce that there are more unmarried customers (58%) than married (42%) and more male customers (72%) than female (28%). Therefore, in the following analyses regarding gender and marital status, we will focus on customers' average purchase amount instead of the sum purchase, because the sum purchase will easily be influenced by the number of people, which may cause a biased conclusion. 
 
-* Plot 1. Distribution of Purchase
+* Plot 1. Distribution of Purchase (Gloria)
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(Purchase)) +
@@ -105,7 +105,7 @@ demo %>%
   labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution")
 ```
 
-* Plot 2. Purchase Distribution by Gender and City
+* Plot 2. Purchase Distribution by Gender and City (Gloria)
 ```{r message=FALSE, warning=FALSE}
 ggthemr('flat dark')
 demo %>%
@@ -116,7 +116,8 @@ demo %>%
   labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution by Gender and City")+
   theme(axis.text.x = element_text(angle = 90, hjust = 0.5))
 ```
-* Plot 3. Purchase Distribution by Occupation
+
+* Plot 3. Purchase Distribution by Occupation (Vincent)
 ```{r message=FALSE, warning=FALSE}
 #Create new data frame grouping by occupation and marital status, and taking the mean purchase of each occupation and status.
 ggthemr_reset()
@@ -131,7 +132,8 @@ demo_occ <- demo %>%
   labs(x = "Occupation", y = "Purchase in Dollars", title = "Purchase Distribution by Occupation", fill="Marital Status") +
     scale_fill_discrete(labels=c("Unmarried", "Married"))
 ```
-* Plot 4. Purchase Distribution by Age
+
+* Plot 4. Purchase Distribution by Age (Gloria)
 ```{r message=FALSE, warning=FALSE}
 ggthemr('sky')
 demo %>%
@@ -139,8 +141,7 @@ demo %>%
   geom_boxplot() +
   labs(x = "Age", y = "Purchase in Dollars", title = "Purchase Distribution by Age")
 ```
-
-* Plot 5. Purchase distribution by stay in city years
+* Plot 5. Purchase distribution by stay in city years (Zilei)
 ```{r message=FALSE, warning=FALSE}
 ggthemr('sky', layout = 'minimal')
 demo %>%
@@ -149,7 +150,6 @@ demo %>%
   labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase Distribution by Stay Years")
 ```
 * Plot 6. The most popular product category
-Product category 1 has three of the most popular products: 5, 1 and 8.
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggthemr('light', layout = 'clean')
 BF_prt = BF %>%
@@ -159,9 +159,13 @@ BF_prt = BF_prt[-c(3:8)]
 BF_prt%>%
   ggplot(aes(x = Product_Category_1))+
   geom_bar(aes(x = fct_infreq(as.factor(Product_Category_1))))+
-  labs(x ="Product Category" , y = "Purchase Amount", title = "Product Category Distribution")
+  labs(x ="Product Category" , y = "Purchase Amount", title = "Product Category 1 Distribution")
   
 ```
+In the above visualization, we decided to choose Product Category 1 and Purchase variables in order to see which products were the highest selling. We decided to omit product 2 and 3 categories because many of the values are zero. Using a bar plot visualization is the most appropriate because it shows continuous data on the y-axis (purchase, using geom_bar) and discrete on the x-axis. We improved the plot by reordering the bars by highest to lowest and changing the theme colors.
+
+We can easily see that the top 3 product 1 categories are 5, 1, and 8, by far. This visualization can help the business because they can direct more marketing dollars toward promoting the top 3 product categories. On the other hand, the company could use this plot to target certain products that it wants to sell more and direct marketing dollars towards those categories.
+
 4. Preliminary statistical analyses  
 **Do men spend more money on Black Friday than women?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
@@ -186,6 +190,8 @@ t.test(demo[demo$Marital_Status == 0, ]$Purchase,
 In this instance, we want to determine whether marital status influences purchase. In table 1 and plot 3, we find that there are more unmarried people than married, and that unmarried customers seem to make more purchases than married customers. Therefore, we want to use an independent t-test to test whether this difference is significant.  
 
 Based on the evidence from this data set and the result from the t-test (p-value = 0.056), we think the probability that unmarried customers have same mean purchase as married customers is bigger than 5% but less than 10%, and that the probability that unmarried customers have larger mean purchase than married customers is less than 95% but bigger than 90%. Therefore, in the 95% confidence interval, we cannot reject the null hypothesis: that unmarried customers have the same mean purchase as married customers. In the 90% confidence interval, however, we can reject the null hypothesis and accept the alternative hypothesis: that unmarried customers have larger mean purchase than married customers.
+
+Because the mean purchase is higher for unmarried people than married people, the company's marketing department could focus on targeting single people in order to increase purchases. However, 
 
 **Is there an association between city and purchase?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
