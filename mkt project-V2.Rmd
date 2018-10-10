@@ -2,9 +2,8 @@
 title: 'Marketing Analytics Project: Black Friday'
 author: "Weicheng Zhang, Zilei Zhang, Maura Oray, Gloria Zheng"
 output:
-  word_document: default
-  html_document:
-    df_print: paged
+word_document: default
+html_document:
 ---
 
 **1. Introduction** 
