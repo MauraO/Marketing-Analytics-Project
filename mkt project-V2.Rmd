@@ -215,4 +215,4 @@ Based on the evidence from this data set and the result from the Chi-Square test
 In terms of a business perspective, it would be wise for the company to analyze which cities are more profitable, so that it can appropriately direct marketing dollars towards either the more profitable or less profitable cities. 
 
 **Conclusion**
-From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, 
+From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, 
