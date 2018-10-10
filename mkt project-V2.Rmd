@@ -15,7 +15,7 @@ html_document:
 The dataset comes from a competition hosted by Analytics Vidhya.
 
 Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
-```{r Echo =TRUE,message=FALSE, warning=FALSE}
+```{r results='hide',message=FALSE, warning=FALSE}
 #Load libraries
 library(VIM)
 library(readr)
@@ -36,55 +36,41 @@ User_ID (discrete, nominal), Product_ID (discrete, nominal), Gender (discrete, n
 
 **b. Mention all the steps you took to clean the data**
 **Step 1. Check if the data contains missing values**
-```{r Echo =TRUE,message=FALSE, warning=FALSE}
+```{r results='hide',message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4) #164,278 NA values
-BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - category_2 is missing
-BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - category_3 is missing
 ```
-In the above visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3 (red indicates the location of NA values). We thus decided to fill the NA values with "0" as this indicates that there were no sub categories in those rows.
+In the above visualization, we wanted to see which variables had the most NA values. We see that the NA values were only concentrated in Product Category 2 and Product Category 3 (red indicates the location of NA values). Because these two variables are sub categories of Product Category 1 and our further analysis does not use them, we deleted them and made a new data set later.
 
 **Step 2. Check the structure of the data**
-```{r Echo =TRUE, message=FALSE, warning=FALSE}
+```{r results='hide', message=FALSE, warning=FALSE}
 summary(BF)
 str(BF)
 ```
+In this part, we wanted to see the type of variables for later use (group_by). We found that there were no factors, therefore, we come to the next step.
+
 **Step 3. Type coercion**
-```{r Echo =TRUE,message=FALSE, warning=FALSE}
+```{r results='hide',message=FALSE, warning=FALSE}
 BF[1:11] = lapply(BF[1:11], factor)
 ```
-The majority of the variables were either integers or characters. We decided to coerce the variables into factors (all except purchase) because the majority of them are categorical, and coercing to factors makes for easier and clearer analysis.
+The majority of the variables were either integers or characters. We decided to coerce the variables into factors (all except purchase) because the majority of them are categorical, and coercing to factors makes for easier and clearer analysis (group_by).
 
 **Step 4. Tidy the data**
-```{r Echo =TRUE,message=FALSE, warning=FALSE}
+```{r results='hide',message=FALSE, warning=FALSE}
 #Select demographic data
 demo = BF %>% 
   select(-starts_with("Product")) %>%
   group_by(User_ID) %>%
   mutate(Purchase = sum(Purchase))
-
-#5891 unique customers
-
 demo = demo[!duplicated(demo$User_ID), ]
 ```
+Because we decided to focus more on customer analysis instead of the product, and Product Category 2 and Product Category 3 have a lot of missing data, we deleted all of the product category columns to make a clearer customer data set. Moreover, we found that the Customer IDs are repeated many times and we need a sum purchase amount. Therefore, we used the customers' whole purchase to replace the individual per product purchase and deleted the redundant customer IDs. 
+
 **3. Summary statistics and Data Visualizations** 
 **Customer Demographics**   
-**Table 1. Distribution of Gender and Marital Status**
-```{r echo=TRUE, message=FALSE, warning=FALSE}
-# Two-way frequency table showing different combination of customers using gender and marital status  
-customer = table(demo$Gender, demo$Marital_Status)
-colnames(customer) = c("Unmarried", "Married")
-rownames(customer) = c("Female", "Male")
 
-addmargins(customer)
-addmargins(prop.table(customer))
-```
-The two-way frequency table shows 4 combinations of customers. There are 5891 distinct customers in total, and 2470 of them are unmarried males; 1755 are married males; 947 are unmarried females; 719 are married females. 
-
-In this two-way frequency table, we can deduce that there are more unmarried customers (58%) than married (42%) and more male customers (72%) than female (28%). Therefore, in the following analyses regarding gender and marital status, we will focus on customers' average purchase amount instead of the sum purchase, because the sum purchase will easily be influenced by the number of people, which may cause a biased conclusion. 
-
-**Plot 1. Distribution of Purchase (Gloria)**
-```{r echo=TRUE, message=FALSE, warning=FALSE}
+**Plot 1. Distribution of Purchase**
+```{r message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(Purchase)) +
   geom_histogram(fill = "#014d64") +
@@ -93,6 +79,8 @@ demo %>%
   scale_fill_economist()+
   labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution")
 ```
+[1]Glorious Christian, Black Friday Analysis https://www.kaggle.com/gloriousc/black-friday-analysis
+
 **Plot 2. Purchase Distribution by Gender and City (Gloria)**
 ```{r message=FALSE, warning=FALSE}
 ggthemr('flat dark')
@@ -125,7 +113,7 @@ demo %>%
   geom_boxplot() +
   labs(x = "Age", y = "Purchase in Dollars", title = "Purchase Distribution by Age")
 ```
-**Plot 5. Purchase distribution by stay in city years (Zilei)**
+**Plot 5. Purchase distribution by stay in city years**
 ```{r message=FALSE, warning=FALSE}
 ggthemr('sky', layout = 'minimal')
 demo %>%
@@ -133,6 +121,8 @@ demo %>%
   geom_boxplot()+
   labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase Distribution by Stay Years")
 ```
+In the above plot, we wanted to find the purchase distribution by stay in current city years. Because stay in current city years is catergorical and purchase is continuous, we chose a boxplot visualization. We used a different theme to make the plot more visually appealing and added labels and titles to make it clearer. From this plot, we found that there may be no difference among the purchase distribution of different current city years stay. But we wanted to have more evidence to draw such conclusion. We used the ANOVA test in the next part to determine whether this difference is significant. Based on the above plot, we drew the conclusion that stay in current city years may not influence the purchase and the store may not need to take this factor into consideration when evaluating marketing decision.  
+
 **Plot 6. The most popular product category**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggthemr('light', layout = 'clean')
@@ -158,9 +148,10 @@ t.test(demo[demo$Gender == "M", ]$Purchase,
        paired = FALSE,
        alternative = "greater")
 ```
-In the above code, we wanted to determine whether gender influences purchase. In table 1 and plot 2, we find that there are more men than women and that men have more purchases than women. Therefore, we want to use an independent t-test to test whether this difference is signficant.  
+In the above code, we wanted to determine whether gender influences purchase. In table 1 and plot 2, we find that there are more men than women and that men have more purchases than women. Because the gender is category and the purchase is continuous, we choose t-test for figuring out whether there is a difference between male and female in purchase.  
+Based on the evidence from this data set and the result from the t-test (p-value < 2.2e-16), we reject the null hypothesis and accept the alternative hypothesis: men have larger mean purchase than women. 
 
-Based on the evidence from this data set and the result from the t-test (p-value < 2.2e-16), we think the probability that men have same mean purchase as women is less than 5%, and the probability that men have larger mean purchase than women is bigger than 95%. The p-value is very low, therefore, we reject the null hypothesis: that men have the same mean purchase as women, and accept the alternative hypothesis: men do not have the same mean purchase as women, and in fact have larger mean purchase. Moreover, from the sample, we can get the estimated mean purchase of men and women: 911963.2 and 699054.0.
+From the statistic analysis, we can give some recommendations to the store. (1) The company need to focus more on male customers because they have stronger purchase power than female and have more methods of promotion towards male customers to increase their revenue.
 
 **Do unmarried customers spend more money on Black Friday than married?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
@@ -170,9 +161,9 @@ t.test(demo[demo$Marital_Status == 0, ]$Purchase,
        paired = FALSE,
        alternative = "greater")
 ```
-In this instance, we want to determine whether marital status influences purchase. In table 1 and plot 3, we find that there are more unmarried people than married, and that unmarried customers seem to make more purchases than married customers. Therefore, we want to use an independent t-test to test whether this difference is significant.  
+In this instance, we want to determine whether marital status influences purchase. In table 1 and plot 3, we find that there are more unmarried people than married, and that unmarried customers seem to make more purchases than married customers. Because maritial status is category and purchase is continuous, we use an independent t-test to test whether this difference is significant.  
 
-Based on the evidence from this data set and the result from the t-test (p-value = 0.056), we think the probability that unmarried customers have same mean purchase as married customers is bigger than 5% but less than 10%, and that the probability that unmarried customers have larger mean purchase than married customers is less than 95% but bigger than 90%. Therefore, in the 95% confidence interval, we cannot reject the null hypothesis: that unmarried customers have the same mean purchase as married customers. In the 90% confidence interval, however, we can reject the null hypothesis and accept the alternative hypothesis: that unmarried customers have larger mean purchase than married customers.
+Based on the evidence from this data set and the result from the t-test (p-value = 0.056), we draw the conclusion that in the 95% confidence interval, we cannot reject the null hypothesis. But in the 90% confidence interval, however, we can reject the null hypothesis and accept the alternative hypothesis: that unmarried customers have larger mean purchase than married customers.
 
 Because the mean purchase is higher for unmarried people than married people, the company's marketing department could focus on targeting single people in order to increase purchases. However, it would be wise not to focus all marketing on single people, since the difference between the mean purchase amount for unmarried versus married is not stark.
 
@@ -184,7 +175,7 @@ A1 = quantile(demo$Purchase, c(0.33,0.66))
 A1
 demo = demo %>% 
   mutate(purchase_category = cut(Purchase, breaks = c(-Inf, 304987.6, 826809.6, Inf),
-  labels = c("City A", "City B", "City C")))
+  labels = c("Low", "Medium", "High")))
 
 # Create two-way frequency table
 table(demo$City_Category, demo$purchase_category)
