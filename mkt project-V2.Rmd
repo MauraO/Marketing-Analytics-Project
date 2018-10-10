@@ -10,7 +10,15 @@ output:
 knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
                       echo=FALSE, warning=FALSE, message=FALSE)
 ```
+1. Introduction 
+Objective:
+* Look at the distribution of customer demographics
+* Determine which variables are highly correlated with purchase
+* Identify which products are high-selling and the characteristics of their customers
 
+The dataset comes from a competition hosted by Analytics Vidhya.
+
+Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
 ```{r message=FALSE, warning=FALSE}
 #Load libraries
 library(VIM)
@@ -20,13 +28,6 @@ library(dplyr)
 
 BF <- read_csv("BlackFriday.csv")
 ```
-
-1. Introduction 
-Objective:
-* Look at the distribution of customer demographics
-* Determine which variables are highly correlated with purchase
-* Identify which products are high-selling and the characteristics of their customers
-
 2. Data Description
 a. Describe the conceptual measure types of the different variables
 
@@ -48,6 +49,9 @@ Step 1. Check if the data contains missing values
 ```{r message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4) #164,278 NA values
+BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - means the category_2 is missing
+BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - means the category_3 is missing
+
 ```
 In the above visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3.
 
