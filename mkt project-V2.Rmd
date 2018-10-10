@@ -70,6 +70,8 @@ demo = BF %>%
   group_by(User_ID) %>%
   mutate(Purchase = sum(Purchase))
 
+#5891 unique customers
+
 demo = demo[!duplicated(demo$User_ID), ]
 ```
 3. Summary statistics and Data Visualizations  
@@ -91,13 +93,13 @@ In this two-way frequency table, we can deduce that there are more unmarried cus
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(Purchase)) +
-  geom_histogram(col = "black", fill = "red1") +
+  geom_histogram(col = "black", fill = "orange") +
   scale_x_continuous(limits = c(0, 11000000)) +
   theme_minimal() +
-  labs(x = "Purchase in dollar", y = "Number of customers", title = "Distribution of purchase")
+  labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution")
 ```
 
-** Purchase disttribution by gender and city**
+** Purchase distribution by gender and city**
 ```{r message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(x = Purchase, fill = Gender)) +
@@ -105,51 +107,53 @@ demo %>%
   facet_grid(~City_Category) +
   scale_x_continuous(limits = c(0, 3000000)) +
   theme_minimal() +
-  labs(x = "Purchase in dollar", y = "Number of customers", title = "Purchase disttribution by gender and city")+
+  labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution by Gender and City")+
   theme(axis.text.x = element_text(angle = 90, hjust = 0.5))
 ```
 
 ** Purchase distribution by occupation**
-```{r}
-demo %>%
-  group_by(Occupation)%>%
+```{r message=FALSE, warning=FALSE}
+demo_occ = demo %>%
+  group_by(Occupation)
+
+demo_occ %>%
   ggplot(aes(x = fct_infreq(Occupation), y = sum(Purchase), fill = Marital_Status)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   coord_flip() +
-  labs(x = "Occupation", y = "Purchase in Dollar", title = "Purchase Distribution by Occupation")
+  labs(x = "Occupation", y = "Purchase in Dollars", title = "Purchase Distribution by Occupation")
 ```
 
-** Purchase distribution by occupation**
-```{r}
+** Purchase distribution by age**
+```{r message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(x = Age, y = Purchase)) +
   geom_boxplot() +
   theme_minimal() +
-  labs(x = "Age", y = "Purchase in Dollar", title = "Purchase Distribution by Age")
+  labs(x = "Age", y = "Purchase in Dollars", title = "Purchase Distribution by Age")
 ```
 
-** Purchase distribution by occupation**
+** Purchase distribution by gender**
 ```{r message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(x = Purchase, fill = Gender)) +
   geom_histogram() +
   scale_x_continuous(limits = c(0, 3000000)) +
   theme_minimal() +
-  labs(x = "Purchase in dollar", y = "Number of customers", title = "Purchase disttribution by gender")
+  labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution by Gender")
 ```
 
-** Purchase distribution by occupation**
+** Purchase distribution by stay in city years**
 ```{r message=FALSE, warning=FALSE}
 demo %>%
   ggplot(aes(x = Stay_In_Current_City_Years, y = Purchase)) +
   geom_boxplot()+
   theme_minimal() +
-  labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase distribution by stay years")
+  labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase Distribution by Current City Years")
 ```
 
 ** What’s the most popular product category?**
-The product category 1 has three most popular product: 5, 1 and 8 - Bar graphs
+The product category 1 has three of the most popular products: 5, 1 and 8 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 BF_prt = BF %>%
   group_by(Product_ID) %>%
@@ -158,42 +162,43 @@ BF_prt = BF_prt[-c(3:8)]
 BF_prt%>%
   ggplot(aes(x = Product_Category_1))+
   geom_bar(aes(x = fct_infreq(as.factor(Product_Category_1))),fill = 'paleturquoise1')
-  
 ```
 
-### 4 Preliminary statistical analyses
-```{r}
-## Independent t test
-# Does men spend more money on Black Friday than women?
+4. Preliminary statistical analyses
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#Independent t-test
+#Do men spend more money on Black Friday than women?
 t.test(demo[demo$Gender == "M", ]$Purchase,
        demo[demo$Gender == "F", ]$Purchase,
        paired = FALSE,
        alternative = "greater")
 ```
+The above two sample t-test has a very low p-value, showing that the null hypothesis is rejected. The null hypothesis in that men do not spend more money than women on Black Friday. 
 
-```{r}
-## Independent t test
-# Does unmarried customers spend more money on Black Friday than the married?
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#Independent t-test
+#Do unmarried customers spend more money on Black Friday than married?
 t.test(demo[demo$Marital_Status == 0, ]$Purchase,
        demo[demo$Marital_Status == 1, ]$Purchase,
        paired = FALSE,
        alternative = "greater")
 ```
+Once again, we have a low p-value (0.056), showing that we will reject the null hypothesis. The null hypothesis is that unmarried customers do not spend more than married customers.
 
-```{r}
-### Chi square test
-## Is there an association between age and purchase?
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#Chi square test
+#Is there an association between age and purchase?
 
-# Creat purchase category
+#Creat purchase category
 demo = demo %>% 
   mutate(purchase_category = cut(Purchase, breaks = c(-Inf, 234914, 512612, 1099005, Inf),
                                         labels = c("low", "middle", "high", "very high")))
 
-# Creat two way frequency table
+#Create two-way frequency table
 table(demo$Age, demo$purchase_category)
 
-# Apply chi square test
+#Apply chi square test
 chisq.test(table(demo$Age, demo$purchase_category))
-
 ```
 
+We decided to use the Chi-Square test to determine association between age and purchase because the variables are continuous. The p-value is extremely low, thus we reject the null hypothesis. The null hypothesis is that there is no association between age and purchase.
