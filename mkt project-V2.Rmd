@@ -1,7 +1,8 @@
 ---
-title: "Marketing Analytics Project: Black Friday"
+title: 'Marketing Analytics Project: Black Friday'
 author: "Weicheng Zhang, Zilei Zhang, Maura Oray, Gloria Zheng"
 output:
+  word_document: default
   html_document:
     df_print: paged
 ---
@@ -32,26 +33,15 @@ BF <- read_csv("BlackFriday.csv")
 **2. Data Description**
 **a. Describe the conceptual measure types of the different variables**
 
-* User_ID: discrete, nominal
-* Product_ID: discrete, nominal
-* Gender: discrete, nominal
-* Age: discrete, ordinal
-* Occupation: discrete, nominal
-* City_Category: discrete, nominal
-* Stay_in_Current_City_Years: continuous, ratio
-* Marital_Status: discrete, nominal
-* Product_Category_1: discrete, nominal
-* Product_Category_2: discrete, nominal
-* Product_Category_3: discrete, nominal
-* Purchase: continuous, ratio
+User_ID (discrete, nominal), Product_ID (discrete, nominal), Gender (discrete, nominal), Age (discrete, ordinal), Occupation (discrete, nominal), City_Category (discrete, nominal), Stay_in_Current_City_Years (continuous, ratio), Marital_Status (discrete, nominal), Product_Category_1 (discrete, nominal), Product_Category_2 (discrete, nominal), Product_Category_3 (discrete, nominal), and Purchase (continuous, ratio). 
 
 **b. Mention all the steps you took to clean the data**
 **Step 1. Check if the data contains missing values**
 ```{r Echo =TRUE,message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4) #164,278 NA values
-BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - means the category_2 is missing
-BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - means the category_3 is missing
+BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - category_2 is missing
+BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - category_3 is missing
 ```
 In the above visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3 (red indicates the location of NA values). We thus decided to fill the NA values with "0" as this indicates that there were no sub categories in those rows.
 
@@ -203,11 +193,13 @@ table(demo$City_Category, demo$purchase_category)
 # Apply Chi-Square test
 chisq.test(table(demo$Age, demo$purchase_category))
 ```
-In the above code, we want to determine whether city stay influences purchase. In Plot 2, we find differences in purchase distribution. Therefore, we want to use a Chi-Square test to see whether this finding is significant. Because the purchase category (new variable created above) is categorical, a Chi-Square test is appropriate.
+In the above code, we want to determine whether city stay influences purchase. In Plot 2, we find differences in purchase distribution. Therefore, we want to use a Chi-Square test to see whether this finding is significant. 
 
 Based on the evidence from this data set and the result from the Chi-Square test (p-value < 2.2e-16), we believe that the probability that there is no difference among the three cities is less than 5%, and the probability that there is a difference among the three cities is bigger than 95%. Therefore, we reject the null hypothesis, and accept the alternative hypothesis: that there is a difference in purchase distribution between the three cities. Therefore, from this data set, we draw the conclusion that there is an association between city and purchase. 
 
 In terms of a business perspective, it would be wise for the company to analyze which cities are more profitable, so that it can appropriately direct marketing dollars towards either the more profitable or less profitable cities. 
 
 **Conclusion**
-From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and that age 
+From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and interestingly, that there was not a huge difference in mean purchase by age (26-35 category spends slightly more). Also interestingly, there is almost no perceivable difference in mean purchase by years in city.
+
+By using statistical tests and visualizations, we are able to easily pinpoint particular demographics on which the company should direct its marketing dollars. Further analysis will illuminate these important demographics.
