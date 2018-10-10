@@ -6,8 +6,8 @@ output:
     df_print: paged
 ---
 
-1. Introduction 
-Objective:
+### 1. Introduction 
+**Objective:**
 * Look at the distribution of customer demographics
 * Determine which variables are highly correlated with purchase
 * Identify which products are high-selling
@@ -15,7 +15,7 @@ Objective:
 The dataset comes from a competition hosted by Analytics Vidhya.
 
 Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
-```{r message=FALSE, warning=FALSE}
+```{r Echo =TRUE,message=FALSE, warning=FALSE}
 #Load libraries
 library(VIM)
 library(readr)
@@ -28,8 +28,8 @@ library(ggthemr)
 
 BF <- read_csv("BlackFriday.csv")
 ```
-2. Data Description
-a. Describe the conceptual measure types of the different variables
+### 2. Data Description
+**a. Describe the conceptual measure types of the different variables**
 
 * User_ID: discrete, nominal
 * Product_ID: discrete, nominal
@@ -44,9 +44,9 @@ a. Describe the conceptual measure types of the different variables
 * Product_Category_3: discrete, nominal
 * Purchase: continuous, ratio
 
-b. Mention all the steps you took to clean the data
-Step 1. Check if the data contains missing values
-```{r message=FALSE, warning=FALSE}
+**b. Mention all the steps you took to clean the data**
+* Step 1. Check if the data contains missing values
+```{r Echo =TRUE,message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4) #164,278 NA values
 BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - means the category_2 is missing
@@ -55,19 +55,19 @@ BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - means the category_
 ```
 In the above visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3.
 
-Step 2. Check the structure of the data
-```{r message=FALSE, warning=FALSE}
+* Step 2. Check the structure of the data
+```{r Echo =TRUE, message=FALSE, warning=FALSE}
 summary(BF)
 str(BF)
 ```
-Step 3. Type coercion
-```{r message=FALSE, warning=FALSE}
+* Step 3. Type coercion
+```{r Echo =TRUE,message=FALSE, warning=FALSE}
 BF[1:11] = lapply(BF[1:11], factor)
 ```
 The majority of the variables were either integers or characters. We decided to coerce the variables into factors (all except purchase) because the majority of them are categorical. 
 
-Step 4. Tidy the data
-```{r message=FALSE, warning=FALSE}
+* Step 4. Tidy the data
+```{r Echo =TRUE,message=FALSE, warning=FALSE}
 #Demographic data
 demo = BF %>% 
   select(-starts_with("Product")) %>%
@@ -79,7 +79,7 @@ demo = BF %>%
 demo = demo[!duplicated(demo$User_ID), ]
 ```
 > ### 3. Summary statistics and Data Visualizations  
-** Customer Demographics**  
+**Customer Demographics**   
 * Table 1. The distribution of Gender and Maritial Status  
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
@@ -151,7 +151,7 @@ demo %>%
 
 * Plot 6. Purchase distribution by stay in city years
 ```{r message=FALSE, warning=FALSE}
-ggthemr('sea', layout = 'minimal')
+ggthemr('sky', layout = 'minimal')
 demo %>%
   ggplot(aes(x = Stay_In_Current_City_Years, y = Purchase)) +
   geom_boxplot()+
@@ -173,7 +173,7 @@ BF_prt%>%
   
 ```
 
-4. Preliminary statistical analyses
+### 4. Preliminary statistical analyses  
 **Do men spend more money on Black Friday than women?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 #Independent t-test
