@@ -139,17 +139,7 @@ demo %>%
   labs(x = "Age", y = "Purchase in Dollar", title = "Purchase Distribution by Age")
 ```
 
-* Plot 5. Purchase distribution by Gender
-```{r message=FALSE, warning=FALSE}
-ggthemr('dust',type = "outer")
-demo %>%
-  ggplot(aes(x = Purchase, fill = Gender)) +
-  geom_histogram()+
-  scale_x_continuous(limits = c(0, 3000000)) +
-  labs(x = "Purchase in Dollar", y = "Number of Customers", title = "Purchase Distribution by Gender")
-```
-
-* Plot 6. Purchase distribution by stay in city years
+* Plot 5. Purchase distribution by stay in city years
 ```{r message=FALSE, warning=FALSE}
 ggthemr('sky', layout = 'minimal')
 demo %>%
@@ -158,7 +148,7 @@ demo %>%
   labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase Distribution by Stay Years")
 ```
 
-* Plot 7. The most popular product category
+* Plot 6. The most popular product category
 The product category 1 has three of the most popular products: 5, 1 and 8 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggthemr('light', layout = 'clean')
