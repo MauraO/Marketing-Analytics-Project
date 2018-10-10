@@ -7,7 +7,7 @@ output:
 ---
 
 **1. Introduction** 
-Objective:
+**Objective:**
 * Look at the distribution of customer demographics
 * Determine which variables are highly correlated with purchase
 * Identify which products are high-selling and the characteristics of their customers
@@ -29,8 +29,8 @@ library(ggthemr)
 
 BF <- read_csv("BlackFriday.csv")
 ```
-2. Data Description
-a. Describe the conceptual measure types of the different variables
+**2. Data Description**
+**a. Describe the conceptual measure types of the different variables**
 
 * User_ID: discrete, nominal
 * Product_ID: discrete, nominal
@@ -45,8 +45,8 @@ a. Describe the conceptual measure types of the different variables
 * Product_Category_3: discrete, nominal
 * Purchase: continuous, ratio
 
-* b. Mention all the steps you took to clean the data
-* Step 1. Check if the data contains missing values
+**b. Mention all the steps you took to clean the data**
+**Step 1. Check if the data contains missing values**
 ```{r Echo =TRUE,message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4) #164,278 NA values
@@ -104,7 +104,6 @@ demo %>%
   scale_fill_economist()+
   labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution")
 ```
-
 **Plot 2. Purchase Distribution by Gender and City (Gloria)**
 ```{r message=FALSE, warning=FALSE}
 ggthemr('flat dark')
@@ -116,23 +115,19 @@ demo %>%
   labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution by Gender and City")+
   theme(axis.text.x = element_text(angle = 90, hjust = 0.5))
 ```
-
 **Plot 3. Purchase Distribution by Occupation (Vincent)**
 ```{r message=FALSE, warning=FALSE}
 #Create new data frame grouping by occupation and marital status, and taking the mean purchase of each occupation and status.
 ggthemr_reset()
-demo_occ <- demo %>%
-  group_by(Occupation, Marital_Status) %>%
-  summarise(Purchase = sum(Purchase)) 
-
-  ggplot(data=demo_occ, aes(x = fct_infreq(Occupation), y = Purchase, fill = Marital_Status)) +
+demo %>%
+  group_by(Occupation) %>%
+  ggplot(aes(x = fct_infreq(Occupation), y = sum(Purchase), fill = Marital_Status)) +
   geom_bar(stat = "identity") +
   theme_minimal() +
   coord_flip() +
   labs(x = "Occupation", y = "Purchase in Dollars", title = "Purchase Distribution by Occupation", fill="Marital Status") +
     scale_fill_discrete(labels=c("Unmarried", "Married"))
 ```
-
 **Plot 4. Purchase Distribution by Age (Gloria)**
 ```{r message=FALSE, warning=FALSE}
 ggthemr('sky')
@@ -165,7 +160,7 @@ In the above visualization, we decided to choose Product Category 1 and Purchase
 
 We can easily see that the top 3 product 1 categories are 5, 1, and 8, by far. This visualization can help the business because they can direct more marketing dollars toward promoting the top 3 product categories. On the other hand, the company could use this plot to target certain products that it wants to sell more and direct marketing dollars towards those categories.
 
-4. Preliminary statistical analyses  
+**4. Preliminary statistical analyses**  
 **Do men spend more money on Black Friday than women?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 #Independent t-test
@@ -215,4 +210,4 @@ Based on the evidence from this data set and the result from the Chi-Square test
 In terms of a business perspective, it would be wise for the company to analyze which cities are more profitable, so that it can appropriately direct marketing dollars towards either the more profitable or less profitable cities. 
 
 **Conclusion**
-From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, 
+From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and that age 
