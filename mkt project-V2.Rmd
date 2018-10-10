@@ -21,19 +21,14 @@ library(dplyr)
 BF <- read_csv("BlackFriday.csv")
 ```
 
-#1. Introduction 
+1. Introduction 
+Objective:
+* Look at the distribution of customer demographics
+* Determine which variables are highly correlated with purchase
+* Identify which products are high-selling and the characteristics of their customers
 
-# Objective:
-* Look at the distribution of customers demographcis
-* Find how is purchase differed w.r.t. demographcis factors and test it
-* what kind of products are sold well and who is buying them (to be decided)
-
-#2. Data Description
-
-#a. Describe the conceptual measure types of the different variables
-```{r}
-BF =  read_csv("BlackFriday.csv")
-```
+2. Data Description
+a. Describe the conceptual measure types of the different variables
 
 * User_ID: discrete, nominal
 * Product_ID: discrete, nominal
@@ -48,28 +43,28 @@ BF =  read_csv("BlackFriday.csv")
 * Product_Category_3: discrete, nominal
 * Purchase: continuous, ratio
 
-#### b. Mention all the steps you took to clean the data
-
-##### Step 1. Check if the data contains missing values
-```{r}
+b. Mention all the steps you took to clean the data
+Step 1. Check if the data contains missing values
+```{r message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
-aggr(BF,cex.axis = .4)
-```
+aggr(BF,cex.axis = .4) #164,278 NA values
 
-##### Step 2. Check the structure of the data
+#In the below visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3.
+```
+Step 2. Check the structure of the data
 ```{r message=FALSE, warning=FALSE}
 summary(BF)
 str(BF)
 ```
-
-#### Step 3. Type coercion
-```{r}
+Step 3. Type coercion
+```{r message=FALSE, warning=FALSE}
 BF[1:11] = lapply(BF[1:11], factor)
 ```
+The majority of the variables were either integers or characters. We decided to coerce the variables into factors (all except purchase) because the majority of them are categorical. 
 
-#### Step 4. Tidy the data
-```{r}
-# Demographics data
+Step 4. Tidy the data
+```{r message=FALSE, warning=FALSE}
+#Demographic data
 demo = BF %>% 
   select(-starts_with("Product")) %>%
   group_by(User_ID) %>%
