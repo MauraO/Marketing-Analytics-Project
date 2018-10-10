@@ -1,0 +1,139 @@
+---
+title: "Interim Report"
+author: "GZ"
+date: "10/8/2018"
+output: html_document
+---
+#Final Project: Interim Repot 1
+##Quenstion 2 
+###a)
+```{r, echo=FALSE}
+library(rmarkdown)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readxl)
+
+setwd("~/Desktop/marketing analytics")
+ BF <- read_csv("~/Desktop/marketing analytics/BlackFriday.csv")
+ 
+ str(BF)
+ dim(BF)
+
+```
+*Answer*
+Measure types of conceptual variables: Character-"Product_ID","Gender","Age","Stay_In_Current_City_Years"; 
+Integer-"Occupation","Marital_Status","Product_Category_1","Product_Category_2","Product_Category_3","Purchase"
+
+```{r}
+#check if data cotains missing values
+install.packages("VIM")
+library('VIM')
+library(dplyr)
+data(BF, package = "VIM")
+dim(BF)
+sum(complete.cases(BF))
+aggr(BF,cex.axis = .4)
+
+#set missing value as "0"
+BF$Product_Category_2[is.na(BF$Product_Category_2)]<-"0"
+BF$Product_Category_3[is.na(BF$Product_Category_3)]<-"0"
+
+
+#clean the data
+demo<-BF %>% 
+select(-starts_with("Product")) %>% 
+group_by(User_ID) %>% 
+mutate(Purchase = sum(Purchase)) %>% 
+distinct(User_ID,.keep_all=TRUE)
+
+#coerce the data type
+demo$Gender<-as.factor(demo$Gender)
+demo$Age<-as.factor(demo$Age)
+demo$Occupation<-as.factor(demo$Occupation)
+demo$City_Category<-as.factor(demo$City_Category)
+demo$Stay_In_Current_City_Years<-as.factor(demo$Stay_In_Current_City_Years)
+demo$Marital_Status<-as.factor(demo$Marital_Status)
+
+glimpse(demo)
+```
+
+## Question 3
+
+```{r}
+
+### I want to see the purchase power of different gender. I choose variable gender, and averge_purchase
+ggplot(demo, aes(x=Gender, y = Purchase)) + geom_boxplot()+theme(plot.title = element_text(hjust = 0.5)) +labs(title="Individual Purchase in different gender", x = "Gender", y = "purchase")
+
+demo_gender<-demo %>% 
+  group_by(Gender) %>% 
+  summarise(count= n(),
+            average_purchase=sum(as.numeric(Purchase))/count)
+            
+  
+ggplot(demo_gender, aes(x=`Gender`,y=`average_purchase`,fill=`Gender`)) +
+  geom_bar(stat="identity",width=0.7,position = "dodge") +
+  geom_text(aes(label=count),position = position_dodge(width = 1),vjust =-0.5) +
+  labs(title="Purchasing power in different gender", x = "Gender", y = "Average_purchase") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+### I want to se purchasing power in different age level
+ggplot(demo, aes(x=Age, y = Purchase)) + geom_boxplot()+theme(plot.title = element_text(hjust = 0.5)) +labs(title="Individual Purchase in different age", x = "Age", y = "purchase")
+
+demo_age<-demo %>% 
+  group_by(Age) %>% 
+  summarise(count=n(),average_purchase=sum(as.numeric(Purchase))/count)
+
+ggplot(demo_age, aes(x=`Age`,y=`average_purchase`,fill=`Age`)) +
+  geom_bar(stat="identity",width=0.7,position = "dodge") +
+  geom_text(aes(label=count),position = position_dodge(width = 1),vjust =-0.5) +
+  labs(title="Purchasing power in different age", x = "Age", y = "Average_purchase") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+### I want to see purchasing power in different occupation
+demo_occupation<-demo %>% 
+  group_by(Occupation) %>% 
+  summarise(count=n(),average_purchase=sum(as.numeric(Purchase))/count)
+
+ggplot(demo_occupation, aes(x=`Occupation`,y=`average_purchase`,fill=`Occupation`)) +
+  geom_bar(stat="identity",width=0.7,position = "dodge") +
+  geom_text(aes(label=count),position = position_dodge(width = 1),vjust =-0.5) +
+  labs(title="Purchasing power in different occupation", x = "Occpation", y = "Average_purchase") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+### I want to see purchasing power in city category and city year
+demo_city<-demo %>% 
+  group_by(City_Category, Stay_In_Current_City_Years) %>% 
+  summarise(count=n(),average_purchase=sum(as.numeric(Purchase))/count)
+
+ggplot(demo_city, aes(x=`City_Category`,y=`average_purchase`,fill=`City_Category`)) +
+  geom_bar(stat="identity",width=0.7,position = "dodge") +
+  geom_text(aes(label=count),position = position_dodge(width = 1),vjust =-0.5) +
+  facet_wrap(~Stay_In_Current_City_Years)+
+  labs(title="Purchasing power in different city", x = "City", y = "Average_purchase") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+### I want to see purchasing power in marriage status
+ggplot(demo, aes(x=Marital_Status, y = Purchase)) + geom_boxplot()+theme(plot.title = element_text(hjust = 0.5)) +labs(title="Individual Purchase in different marriage statue", x = "Marital_Statue", y = "purchase")
+
+demo_marriage_status<-demo %>% 
+  group_by(Marital_Status) %>% 
+  summarise(count=n(),average_purchase=sum(as.numeric(Purchase))/count)
+  
+ggplot(demo_marriage_status, aes(x=`Marital_Status`,y=`average_purchase`,fill=`Marital_Status`)) +
+  geom_bar(stat="identity",width=0.7,position = "dodge") +
+  geom_text(aes(label=count),position = position_dodge(width = 1),vjust =-0.5) +
+  labs(title="Purchasing power in different marital status", x = "Marital Status", y = "Average_purchase") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
