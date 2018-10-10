@@ -191,7 +191,7 @@ In this instance, we want to determine whether marital status influences purchas
 
 Based on the evidence from this data set and the result from the t-test (p-value = 0.056), we think the probability that unmarried customers have same mean purchase as married customers is bigger than 5% but less than 10%, and that the probability that unmarried customers have larger mean purchase than married customers is less than 95% but bigger than 90%. Therefore, in the 95% confidence interval, we cannot reject the null hypothesis: that unmarried customers have the same mean purchase as married customers. In the 90% confidence interval, however, we can reject the null hypothesis and accept the alternative hypothesis: that unmarried customers have larger mean purchase than married customers.
 
-Because the mean purchase is higher for unmarried people than married people, the company's marketing department could focus on targeting single people in order to increase purchases. However, 
+Because the mean purchase is higher for unmarried people than married people, the company's marketing department could focus on targeting single people in order to increase purchases. However, it would be wise not to focus all marketing on single people, since the difference between the mean purchase amount for unmarried versus married is not stark.
 
 **Is there an association between city and purchase?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
@@ -214,4 +214,4 @@ In the above code, we want to determine whether city stay influences purchase. I
 Based on the evidence from this data set and the result from the Chi-Square test (p-value < 2.2e-16), we believe that the probability that there is no difference among the three cities is less than 5%, and the probability that there is a difference among the three cities is bigger than 95%. Therefore, we reject the null hypothesis, and accept the alternative hypothesis: that there is a difference in purchase distribution between the three cities. Therefore, from this data set, we draw the conclusion that there is an association between the city stay and purchase. 
 
 Conclusion
-From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. 
+From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, 
