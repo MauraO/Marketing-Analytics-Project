@@ -6,11 +6,11 @@ output:
     df_print: paged
 ---
 
-### 1. Introduction 
-**Objective:**
+1. Introduction 
+Objective:
 * Look at the distribution of customer demographics
 * Determine which variables are highly correlated with purchase
-* Identify which products are high-selling
+* Identify which products are high-selling and the characteristics of their customers
 
 The dataset comes from a competition hosted by Analytics Vidhya.
 
@@ -21,6 +21,7 @@ library(VIM)
 library(readr)
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 library(ggthemes)
 library(devtools)
 devtools::install_github('cttobin/ggthemr')
@@ -28,8 +29,8 @@ library(ggthemr)
 
 BF <- read_csv("BlackFriday.csv")
 ```
-### 2. Data Description
-**a. Describe the conceptual measure types of the different variables**
+2. Data Description
+a. Describe the conceptual measure types of the different variables
 
 * User_ID: discrete, nominal
 * Product_ID: discrete, nominal
@@ -44,16 +45,15 @@ BF <- read_csv("BlackFriday.csv")
 * Product_Category_3: discrete, nominal
 * Purchase: continuous, ratio
 
-**b. Mention all the steps you took to clean the data**
+* b. Mention all the steps you took to clean the data
 * Step 1. Check if the data contains missing values
 ```{r Echo =TRUE,message=FALSE, warning=FALSE}
 sum(complete.cases(BF))
 aggr(BF,cex.axis = .4) #164,278 NA values
 BF$Product_Category_2[is.na(BF$Product_Category_2)]<- 0 #0 - means the category_2 is missing
 BF$Product_Category_3[is.na(BF$Product_Category_3)]<- 0 #0 - means the category_3 is missing
-
 ```
-In the above visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3.
+In the above visualization, we wanted to see which variables had the most NA values. We saw that the NA values were only concentrated in Product Category 2 and Product Category 3. We thus decided to fill the NA values with "0" as this indicates that there were no sub categories in those rows.
 
 * Step 2. Check the structure of the data
 ```{r Echo =TRUE, message=FALSE, warning=FALSE}
@@ -78,12 +78,12 @@ demo = BF %>%
 
 demo = demo[!duplicated(demo$User_ID), ]
 ```
-> ### 3. Summary statistics and Data Visualizations  
+3. Summary statistics and Data Visualizations  
 **Customer Demographics**   
 * Table 1. The distribution of Gender and Maritial Status  
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-# Two way frequency table showing different combination of customers using gender and marital status  
+# Two-way frequency table showing different combination of customers using gender and marital status  
 customer = table(demo$Gender, demo$Marital_Status)
 colnames(customer) = c("Unmarried", "Married")
 rownames(customer) = c("Female", "Male")
@@ -91,8 +91,8 @@ rownames(customer) = c("Female", "Male")
 addmargins(customer)
 addmargins(prop.table(customer))
 ```
+The two-way frequency table shows 4 combinations of customers. There are 5891 distinct customers in total, and 2470 of them are unmarried males; 1755 are married males; 947 are unmarried females; 719 are married females. 
 
-The two-way frequency table shows 4 combinations of customers. There are 5891 distinct customers in total, and 2470 of them are unmarried males; 1755 are married males; 947 are unmarried females; 719 are married females.  
 In this two-way frequency table, we can deduce that there are more unmarried customers (58%) than married (42%) and more male customers (72%) than female (28%). Therefore, in the following analyses regarding gender and marital status, we will focus on customers' average purchase amount instead of the sum purchase, because the sum purchase will easily be influenced by the number of people, which may cause a biased conclusion. 
 
 * Plot 1. Distribution of Purchase
@@ -149,7 +149,7 @@ demo %>%
 ```
 
 * Plot 6. The most popular product category
-The product category 1 has three of the most popular products: 5, 1 and 8 
+Product category 1 has three of the most popular products: 5, 1 and 8.
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 ggthemr('light', layout = 'clean')
 BF_prt = BF %>%
@@ -162,8 +162,7 @@ BF_prt%>%
   labs(x ="Product Category" , y = "Purchase Number", title = "The Distribution of Product Category")
   
 ```
-
-### 4. Preliminary statistical analyses  
+4. Preliminary statistical analyses  
 **Do men spend more money on Black Friday than women?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 #Independent t-test
@@ -172,8 +171,9 @@ t.test(demo[demo$Gender == "M", ]$Purchase,
        paired = FALSE,
        alternative = "greater")
 ```
-Because we want to figure out whether the gender influence the purchase. In table 1 and plot 2, we find that there are more male than female and male have more purchase than female. Therefore, we want to use an independent t-test to test whether it is significant.   
-Based on the evidence from this data set and the result from t-test(p-value < 2.2e-16), we think the probability that male have same mean purchase as female is less than 5%, and the probability that male have larger mean purchase than female is bigger than 95%. Therefore, we reject the null hypothesis: the male have the same mean purchase as female, and accept the alternative hypothesis: Male have larger mean purchase than female. Moreover, from the sample, we can get the estimated mean purchase of male and female: 911963.2 and 699054.0
+In the above code, we wanted to determine whether gender influences purchase. In table 1 and plot 2, we find that there are more men than women and that men have more purchases than women. Therefore, we want to use an independent t-test to test whether this difference is signficant.  
+
+Based on the evidence from this data set and the result from the t-test (p-value < 2.2e-16), we think the probability that men have same mean purchase as women is less than 5%, and the probability that men have larger mean purchase than women is bigger than 95%. The p-value is very low, therefore, we reject the null hypothesis: that men have the same mean purchase as women, and accept the alternative hypothesis: men do not have the same mean purchase as women, and in fact have larger mean purchase. Moreover, from the sample, we can get the estimated mean purchase of men and women: 911963.2 and 699054.0.
 
 **Do unmarried customers spend more money on Black Friday than married?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
@@ -183,24 +183,26 @@ t.test(demo[demo$Marital_Status == 0, ]$Purchase,
        paired = FALSE,
        alternative = "greater")
 ```
-Because we want to figure out whether the maritial status influence the purchase. In table 1 and plot 3, we find that there are more unmarritial people than maritial people and unmaritial customers seem to have more purchase than maritial customers. Therefore, we want to use an independent t-test to test whether it is significant.  
-Based on the evidence from this data set and the result from t-test(p-value = 0.056), we think the probability that unmaritial customers have same mean purchase as maritial customers is bigger than 5% but less than 10% , and the probability that unmaritial customers have larger mean purchase than maritial customers is less than 95% but bigger than 90%. Therefore, in 95% confidential level, we can not reject the null hypothesis: the unmatitial customers have the same mean purchase as maritial customers, but in 90% confidential level, we can reject it and accept the alternative hypothesis: unmaritial customers have larger mean purchase than maritial customers.
+In this instance, we want to determine whether marital status influences purchase. In table 1 and plot 3, we find that there are more unmarried people than married, and that unmarried customers seem to make more purchases than married customers. Therefore, we want to use an independent t-test to test whether this difference is significant.  
+
+Based on the evidence from this data set and the result from the t-test (p-value = 0.056), we think the probability that unmarried customers have same mean purchase as married customers is bigger than 5% but less than 10%, and that the probability that unmarried customers have larger mean purchase than married customers is less than 95% but bigger than 90%. Therefore, in the 95% confidence interval, we cannot reject the null hypothesis: that unmarried customers have the same mean purchase as married customers. In the 90% confidence interval, however, we can reject the null hypothesis and accept the alternative hypothesis: that unmarried customers have larger mean purchase than married customers.
 
 **Is there an association between City and purchase?**
-```{r}
-# Chi square test
-# Creat purchase category
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# Chi-Square test
+# Create purchase categories
 A1 = quantile(demo$Purchase, c(0.33,0.66))
 A1
 demo = demo %>% 
   mutate(purchase_category = cut(Purchase, breaks = c(-Inf, 304987.6, 826809.6, Inf),
   labels = c("City A", "City B", "City C")))
 
-# Creat two way frequency table
+# Create two-way frequency table
 table(demo$City_Category, demo$purchase_category)
 
-# Apply chi square test
+# Apply Chi-Square test
 chisq.test(table(demo$Age, demo$purchase_category))
 ```
-Because we want to figure out whether the cities customers stay in will influence purchase. In Plot 2, we find that there may exist difference in purchase distribution of the three cities. Therefore, we want to use a Chi-test to see whether this finding is significant.  
-Based on the evidence from this data set and the result from Chi-test(p-Value < 2.2e-16), we think the probability that there is no difference among three cities is less than 5%, and the probability that there exists difference among three cities is bigger than 95%. Therefore, we reject the null hypothesis, and accept the alternative hypothesis: there exists difference in purchase distribution of the three cities. Therefore, from this data set, we draw the conclusion that there is an association between the city customers live in and purchase. 
+In the above code, we want to determine whether city stay influences purchase. In Plot 2, we find differences in purchase distribution. Therefore, we want to use a Chi-Square test to see whether this finding is significant. Because the purchase category (new variable created above) is categorical, a Chi-Square test is appropriate.
+
+Based on the evidence from this data set and the result from the Chi-Square test (p-value < 2.2e-16), we believe that the probability that there is no difference among the three cities is less than 5%, and the probability that there is a difference among the three cities is bigger than 95%. Therefore, we reject the null hypothesis, and accept the alternative hypothesis: that there is a difference in purchase distribution between the three cities. Therefore, from this data set, we draw the conclusion that there is an association between the city stay and purchase. 
