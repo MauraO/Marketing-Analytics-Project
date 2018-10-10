@@ -206,3 +206,6 @@ chisq.test(table(demo$Age, demo$purchase_category))
 In the above code, we want to determine whether city stay influences purchase. In Plot 2, we find differences in purchase distribution. Therefore, we want to use a Chi-Square test to see whether this finding is significant. Because the purchase category (new variable created above) is categorical, a Chi-Square test is appropriate.
 
 Based on the evidence from this data set and the result from the Chi-Square test (p-value < 2.2e-16), we believe that the probability that there is no difference among the three cities is less than 5%, and the probability that there is a difference among the three cities is bigger than 95%. Therefore, we reject the null hypothesis, and accept the alternative hypothesis: that there is a difference in purchase distribution between the three cities. Therefore, from this data set, we draw the conclusion that there is an association between the city stay and purchase. 
+
+Conclusion
+From our preliminary data analysis, 
