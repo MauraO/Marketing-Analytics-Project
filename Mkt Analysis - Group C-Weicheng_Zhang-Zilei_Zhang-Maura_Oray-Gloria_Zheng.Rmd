@@ -1,0 +1,384 @@
+---
+title: 'Marketing Analytics Project: Black Friday'
+author: "Weicheng Zhang, Zilei Zhang, Maura Oray, Gloria Zheng"
+output: word_document
+---
+
+**1. Introduction** 
+
+The dataset here is a sample of the transactions made in a retail store during “Black Friday.” The store wants to gain a better understanding about customer purchase behavior compared to different products. This is useful for the company to make purchasing decisions for the next year.
+
+In this project, we want to:(i) Look at the distribution of customer demographics; (ii) Determine which variables are highly correlated with purchase; (iii) Identify which products are high-selling.
+
+The dataset comes from a competition hosted by Analytics Vidhya.
+
+Group Github url: https://github.com/MauraO/Marketing-Analytics-Project
+```{r message=FALSE, warning=FALSE, include=FALSE, results='hide'}
+#Load libraries
+library(VIM)
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(devtools)
+devtools::install_github('cttobin/ggthemr')
+library(ggthemr)
+
+setwd('~/desktop')
+BF <- read_csv("BlackFriday.csv")
+```
+**2. Data Description**
+
+**a. Describe the conceptual measure types of the different variables**
+
+User_ID (discrete, nominal), Product_ID (discrete, nominal), Gender (discrete, nominal), Age (discrete, ordinal), Occupation (discrete, nominal), City_Category (discrete, nominal), Stay_in_Current_City_Years (continuous, ratio), Marital_Status (discrete, nominal), Product_Category_1 (discrete, nominal), Product_Category_2 (discrete, nominal), Product_Category_3 (discrete, nominal), and Purchase (continuous, ratio). 
+
+**b. Mention all the steps you took to clean the data**
+
+**Step 1. Check if the data contains missing values**
+```{r echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
+sum(complete.cases(BF))
+aggr(BF,cex.axis = .4)
+```
+In the visualization in the appendix, we wanted to see which variables had the most NA values. We see that the NA values were only concentrated in Product Category 2 and Product Category 3 (red indicates the location of NA values). Because these two variables are sub categories of Product Category 1 and our further analysis does not use them, we deleted them and made a new data set later.
+
+**Step 2. Check the structure of the data**
+```{r results='hide', message=FALSE, warning=FALSE}
+summary(BF)
+str(BF)
+```
+In this part, we wanted to see the type of variables for later use (group_by). We found that there were no factors, which leads us to the next step.
+
+**Step 3. Type coercion**
+```{r results='hide',message=FALSE, warning=FALSE}
+BF[1:11] = lapply(BF[1:11], factor)
+```
+The majority of the variables were either integers or characters. We decided to coerce the variables' type into factors (all except purchase) because the majority of them are categorical, and coercing to factors makes for easier and clearer analysis (group_by).
+
+**Step 4. Tidy the data**
+```{r results='hide',message=FALSE, warning=FALSE}
+#Select demographic data
+demo = BF %>% 
+  select(-starts_with("Product")) %>%
+  group_by(User_ID) %>%
+  mutate(Purchase = sum(Purchase))
+demo = demo[!duplicated(demo$User_ID), ]
+```
+Because the product category 1 is enough to confirm the general product category, and that Product Category 2 and Product Category 3 have a lot of missing data, we deleted all of the product category columns to make a clearer customer data set. Moreover, we found that the Customer IDs were repeated many times which is redundant and we needed a purchase sum. Therefore, we used customers’ whole purchase amount to replace the individual product purchase and deleted the redundant customer IDs. 
+
+**3. Summary statistics and Data Visualizations** 
+**Customer Demographics**   
+
+**Plot 1. Distribution of Purchase**
+```{r message=FALSE, warning=FALSE}
+par(mfrow=c(2,2))
+demo %>%
+  ggplot(aes(Purchase)) +
+  geom_histogram(fill = "#014d64") +
+  scale_x_continuous(limits = c(0, 11000000)) +
+  theme_economist(base_size=14)+
+  scale_fill_economist()+
+  labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution")
+```
+We selected the variable “Purchase.” We decided to use a histogram to view the distribution of customers and purchase. 
+
+From the graph, it shows a downward slope between number of customers and purchase, which illustrates that a larger numbers of customers spend in a lower price and a fewer number of customers spend in the higher price.
+
+**Plot 2. Purchase Distribution by Gender and City**
+```{r message=FALSE, warning=FALSE}
+ggthemr('flat dark')
+demo %>%
+  ggplot(aes(x = Purchase, fill = Gender)) +
+  geom_histogram() +
+  facet_wrap(~City_Category) +
+  scale_x_continuous(limits = c(0, 3000000)) +
+  labs(x = "Purchase in Dollars", y = "Number of Customers", title = "Purchase Distribution by Gender and City")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 0.5))
+```
+We select variable “Gender”, “City” to see the purchasing distribution of different gender in different cities. We also use histogram because variable “Purchase” is a continuous data. We are interested in comparing the purchasing pattern in different cities and different genders. We use facets which divided purchasing pattern into three cities. It shows that at the same price more customers spend in city “C”, and fewer customers spend in city “A”. Moreover, in each city, at the same price male customers' purchase more than female customers'.
+
+**Plot 3. Purchase Distribution by Occupation**
+```{r message=FALSE, warning=FALSE}
+#Create new data frame grouping by occupation and marital status, and taking the mean purchase of each occupation and status.
+ggthemr_reset()
+demo %>%
+  group_by(Occupation) %>%
+  ggplot(aes(x = fct_infreq(Occupation), y = sum(Purchase), fill = Marital_Status)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  coord_flip() +
+  labs(x = "Occupation", y = "Purchase in Dollars", title = "Purchase Distribution by Occupation", fill="Marital Status") +
+    scale_fill_discrete(labels=c("Unmarried", "Married"))
+```
+We were interested in which occupations spend more and whether the married customers spend more than the unmarried customers on Black Friday. Since marital status and occupation are factor (discrete) variables, and purchase are continuous variable, we used bar-plot to show total purchase for each occupation, split by marital status. Without looking at the marital status, this bar-plot shows the purchase distribution among 21 occupations and can provide information like “How much does customers from occupation x spend on Black Friday.” Taking into account marital status, the plot answers whether the married customers or the unmarried customers spend more on Black Friday. We make the plot more readable by flipping the coordinates and recording the purchasing by occupation in ascending order. Generally, unmarried customers spend more on Black Friday and this holds true for most occupations. Specifically, occupation 17, 1, 7, 0 and 4 are the five occupations that spend the most money, over 2 trillions, of which occupation 4 purchases the most. Interestingly, for occupation 10, the married customers hardly spend money on Black Friday.  
+
+**Plot 4. Purchase Distribution by Age**
+```{r message=FALSE, warning=FALSE}
+ggthemr('sky')
+demo %>%
+  ggplot(aes(x = Age, y = Purchase)) +
+  geom_boxplot() +
+  labs(x = "Age", y = "Purchase in Dollars", title = "Purchase Distribution by Age")
+```
+Here we wanted to determine if there are similar purchasing patterns in different age ranges. A boxplot is the most appropriate visualization because age is discrete and purchase is continuous. We improved the plot by setting the theme as sky. The boxplot can answer the question if is there a difference in median purchase among the 7 groups. Customers aged from 18-55 have similar median purchases except for group 36-35, which has the highest median purchase and range. Customers who are under 17 or over 55, however seem to spend a little bit less.
+
+**Plot 5. Purchase distribution by stay in city years**
+```{r message=FALSE, warning=FALSE}
+ggthemr('sky', layout = 'minimal')
+demo %>%
+  ggplot(aes(x = Stay_In_Current_City_Years, y = Purchase)) +
+  geom_boxplot()+
+  labs(x = "Stay in Current City Years", y = "Purchase", title = "Purchase Distribution by Stay Years")
+```
+In the above plot, we wanted to find the purchase distribution by stay in current city years. Because stay in current city years is discrete and purchase is continuous, we chose a boxplot visualization. We used a different theme to make the plot more visually appealing and added labels and titles to make it clearer. From this plot, we found that there may be no difference among the purchase distribution of different current city years stay. But we wanted to have more evidence to draw such conclusion. We used the ANOVA test in the next part to determine whether this difference is significant. Based on the above plot, we drew the conclusion that stay in current city years may not influence the purchase and the store may not need to take this factor into consideration when evaluating marketing decisions. 
+
+**Plot 6. The most popular product category**
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggthemr('light', layout = 'clean')
+BF%>%
+  ggplot(aes(x = Product_Category_1))+
+  geom_bar(aes(x = fct_infreq(as.factor(Product_Category_1))))+
+  labs(x ="Product Category" , y = "Purchase Frequency", title = "The Distribution of Product Category 1 Frequency")
+```
+In the above visualization, we decided to choose Product Category 1 and Purchase variables in order to see which products were the highest selling. We decided to omit product 2 and 3 categories because many of the values are zero. Using a bar plot visualization is the most appropriate because it shows continuous data on the y-axis (purchase, using geom_bar) and discrete on the x-axis. We improved the plot by reordering the bars by highest to lowest and changing the theme colors.
+
+We can easily see that the top 3 product 1 categories are 5, 1, and 8, by far. This visualization can help the business because they can direct more marketing dollars toward promoting the top 3 product categories. On the other hand, the company could use this plot to target certain products that it wants to sell more and direct marketing dollars towards those categories.
+
+**Plot 7. The most Cost product category**  
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggthemr('light', layout = 'clean')
+BF_prt_1 = BF %>%
+  group_by(Product_Category_1, User_ID) %>%
+  mutate(sumpp = sum(Purchase))%>%
+  select(Product_Category_1, avgpp)
+BF_prt_1 = BF_prt_1[!duplicated(BF_prt_1$Product_Category_1), ]
+
+BF_prt_1%>%
+  ggplot(aes(x = Product_Category_1, y=avgpp))+
+  geom_bar(stat = 'identity')+
+  labs(x ="Product Category" , y = "Purchase Cost", title = "The Distribution of Product Category 1's Cost")
+```
+In the above plot, we decided to futher analyze whether the most popular category 5,1,8 are the most valuable categories. Therefore, we calculated the average purchase amount of each category in Product Category 1. Because we wanted to see the comparision between different product category, we use a bar plot.  
+
+From plot 6, we thought the Category 5,1, 8 are the most popular categories. However, when we ploted the distribution of average purchase amount of Product Category 1, we found that the most popular categories are not the ones that can help the company earn the most.  
+
+**Plot 8. The Number of Items in product category**  
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ggthemr('light', layout = 'clean')
+BF_prt_2 = BF %>%
+  select(Product_Category_1, Product_ID)
+BF_prt_2 = BF_prt_2[!duplicated(BF_prt_2$Product_ID), ]
+BF_prt_2 = count(BF_prt_2,Product_Category_1)
+
+BF_prt_2%>%
+  ggplot(aes(x = Product_Category_1, y=n))+
+  geom_bar(stat = 'identity')+
+  labs(x ="Product Category" , y = "Customer Number", title = "The Number of Items in Product Category 1")
+```  
+In the above plot, we decided to figure out why the category 5,1,8 are the most popular ones. We assumed that the number of items in these categories may lead to their popular. Therefore, we made a plot to see how many items that each product categpory contains. Also, because we want to directly see the comparision of each category, the bar plot is our choice.  
+
+Based on Plot 8, we could figure out the reason why category 5,1,8 are the most popular categories. The products they contain are far more than the other categories. If they contains more products, the customer's purchase frequency of these three category are more likely higher than the others'.  
+
+**Plot 9. The Number of Customers in product category**
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# 如果一个顾客买了好几次同一个category, 算几次？下面这个代码只算了一次
+# for example, User ID 1000004, bought product category 1 for 3 times. (but not the same produ ct.)
+ggthemr('light', layout = 'clean')
+BF_prt_3 = BF %>%
+  select(Product_Category_1, User_ID)
+BF_prt_3 = BF_prt_3[!duplicated(BF_prt_3), ]
+BF_prt_3 = count(BF_prt_3,Product_Category_1)
+
+
+BF_prt_3%>%
+  ggplot(aes(x = Product_Category_1, y=n))+
+  geom_bar(stat = 'identity')+
+  labs(x ="Product Category" , y = "Customer Number", title = "The Number of Customers in Product Category 1")
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+BF_prt_4 = BF %>%
+  group_by(Product_Category_1) %>%
+  mutate(sumpp = sum(Purchase))%>%
+  select(Product_Category_1, sumpp)
+BF_prt_4 = BF_prt_4[!duplicated(BF_prt_4$Product_Category_1), ]
+
+category = inner_join(BF_prt_2, BF_prt_3, by = "Product_Category_1")
+category = inner_join(category, BF_prt_4, by = "Product_Category_1")
+
+names(category) <-c('Product_Category', 'Item_Number','Customer_Number', 'Purchase Amount')
+
+## 我们还有其他aggregation的方法 但是sample size太小了 所以不做回归了
+```
+**4. Preliminary statistical analyses**  
+
+**Test 1. Do men spend more money on Black Friday than women?**
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#Independent t-test
+t.test(demo[demo$Gender == "M", ]$Purchase,
+       demo[demo$Gender == "F", ]$Purchase,
+       paired = FALSE,
+       alternative = "greater")
+```
+In the above code, we wanted to determine whether gender influences purchase. In table 1 and plot 2, we find that there are more men than women and that men have more purchases than women. Because gender is discrete and purchase is continuous, we chose to apply a t-test to determine whether there is a difference between males and females in purchase.  
+Based on the evidence from this data set and the result from the t-test (p-value < 2.2e-16), we reject the null hypothesis and accept the alternative hypothesis: that men have a larger mean purchase than women.  
+From the statistical analysis, we recommend that the store should focus more on male customers because they have stronger purchasing power than women and for the store to have more methods of promotion towards male customers in order to increase their revenue.
+
+**Test 2. Do unmarried customers spend more money on Black Friday than married?**
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#Independent t-test
+t.test(demo[demo$Marital_Status == 0, ]$Purchase,
+       demo[demo$Marital_Status == 1, ]$Purchase,
+       paired = FALSE,
+       alternative = "greater")
+```
+In this instance, we want to determine whether marital status influences purchase. In table 1 and plot 3, we find that there are more unmarried people than married, and that unmarried customers seem to make more purchases than married customers. Because maritial status is category and purchase is continuous, we use an independent t-test to test whether this difference is significant.  
+
+Based on the evidence from this data set and the result from the t-test (p-value = 0.056), we draw the conclusion that in the 95% confidence interval, we cannot reject the null hypothesis. But in the 90% confidence interval, however, we can reject the null hypothesis and accept the alternative hypothesis: that unmarried customers have larger mean purchase than married customers.
+
+Because the mean purchase is higher for unmarried people than married people, the company's marketing department could focus on targeting single people in order to increase purchases. However, it would be wise not to focus all marketing on single people, since the difference between the mean purchase amount for unmarried versus married is not stark.
+
+**Test 3. Is there an association between city and purchase?**
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# Mutate a new column
+demo = demo %>% 
+  mutate(purchase_category = cut(Purchase, breaks = c(-Inf, 304987.6, 826809.6, Inf),
+  labels = c("Low", "Medium", "High")))
+table(demo$City_Category, demo$purchase_category)
+
+# Apply Chi-Square test
+chisq.test(table(demo$Age, demo$purchase_category))
+```
+In the above code, we want to determine whether city stay influences purchase. In Plot 2, we find differences in purchase distribution. Therefore, we want to use a Chi-Square test to see whether this finding is significant. 
+
+Based on the evidence from this data set and the result from the Chi-Square test (p-value < 2.2e-16), we believe that the probability that there is no difference among the three cities is less than 5%, and the probability that there is a difference among the three cities is bigger than 95%. Therefore, we reject the null hypothesis, and accept the alternative hypothesis: that there is a difference in purchase distribution between the three cities. Therefore, from this data set, we draw the conclusion that there is an association between city and purchase. 
+
+In terms of a business perspective, it would be wise for the company to analyze which cities are more profitable, so that it can appropriately direct marketing dollars towards either the more profitable or less profitable cities. 
+
+**Test 4. Is there an association between Age and purchase?**
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# Chi-Square test
+# Create purchase categories
+demo = demo %>% 
+  mutate(purchase_category = cut(Purchase, breaks = c(-Inf, 304987.6, 826809.6, Inf),
+  labels = c("low", "medium", "high")))
+
+# Create two-way frequency table
+table(demo$Age, demo$purchase_category)
+
+# Apply Chi-Square test
+chisq.test(table(demo$Age, demo$purchase_category))
+```
+In plot 4, there is slight difference between average purchase in the 7 age ranges. So we want to test if the difference significant in the whole population. Since both age and purchase category are descete variables with more than 2 categories, we use chi-square test. This test can determine if there is an association between age ranges and purchase level. The result shows that p-value for this test is 0 so we reject the null hypothesis that  It can be concluded from output that age ranges do affect the purchase on BlackFriday. For example, in group 0-17, the higher the purchase level, the less the customers, while in group 26-35 the number of custmers are increasing with the price levels. 
+
+**Test 5. Is there an association between staying years and purchase?**
+
+```{r}
+stay = lm(Purchase ~ Stay_In_Current_City_Years, data = demo)
+anova(stay)
+pairwise.t.test(demo$Purchase, demo$Stay_In_Current_City_Years, p.adjust.method = "bonferroni")
+```
+
+The boxplot of stay in a city exhibits highly similar patterns for each subgroup. Therefore, we are interested in testing the relationship between stay years in a certain city with BlackFriday purchases in the population level. Stay is factor variable with 5 categories and purchase is a continuous variable, so we use analysis of variance (ANOVA), which is the extesion of t test and can be used to test whether there are significant differences in more than 2 population means (Ralph, 2010). However, since ANOVA do not tell how is the mean of one population group differed with the others, we still need to use pair-wise t test. Pair-wise t test enables us to compare multiple groups means with correlation pair-wisely. The p-value table shows that the differences in average purchase are not significantly different no matter how long customers have been living here. This is because the all the p-values are greater than 0.05. Therefore we can conclude that duration of stays in a city does not influence customers' purchasing behavior on Black Friday.
+
+**Conclusion**
+
+From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and interestingly, that there was not a huge difference in mean purchase by age (26-35 category spends slightly more). Also interestingly, there is almost no perceivable difference in mean purchase by years in city. For the marital status, its effect on purchase is ambiguous. Based on the current data, we cannot confidentially say that there exists difference between married and unmarried customers. We need more data to analyze this problem later.
+
+By using statistical tests and visualizations, we are able to easily pinpoint particular demographics on which the company should direct its marketing dollars. Further analysis will illuminate these important demographics.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}                          
+lm_gender=lm(log(Purchase)~Gender,data=demo)
+summary(lm_gender)
+
+lm_age=lm(log(Purchase)~Age,data=demo)
+summary(lm_age)
+
+lm_occupation=lm(log(Purchase)~Occupation,data=demo)
+summary(lm_occupation)
+
+lm_citycategory=lm(log(Purchase)~City_Category,data=demo)
+summary(lm_citycategory)
+
+lm_stayincityyears=lm(log(Purchase)~Stay_In_Current_City_Years,data=demo)
+summary(lm_stayincityyears)
+
+
+lm_marital=lm(log(Purchase)~Marital_Status,data=demo)
+summary(lm_marital)
+
+lm_multiple=lm(log(Purchase)~Gender+Age+Occupation+City_Category+Stay_In_Current_City_Years+Marital_Status
++Gender,data=demo)
+
+lm_multiple=lm(log(Purchase)~Gender+Age+Occupation+City_Category+Stay_In_Current_City_Years+Marital_Status
++Gender*Marital_Status+City_Category*Stay_In_Current_City_Years+Occupation*City_Category,data=demo)
+
+summary(lm_multiple)
+anova(lm_multiple)
+```
+
+```{r}
+# Segmentaion
+seg.df  <- demo
+
+# Group differences
+seg.summ <- function(data, groups) {
+  aggregate(data, list(groups), function(x) mean(as.numeric(x)))  
+}
+
+# K-means clustering
+seg.df.num <- seg.df
+seg.df.num$Gender <- ifelse(seg.df$Gender=="F", 0, 1)
+seg.df$Age[which(seg.df$Age == '0-17')]<-0
+  {seg.df$Age = 0}
+seg.df.num$subscribe <- (seg.df$City_Category=="A", 0, 1)
+
+## Scaling the data 
+scaled_data = scale(seg.df.num)
+
+## How many clusters to choose?
+k.max <- 15
+wss <- sapply(1:k.max, 
+              function(k){kmeans(scaled_data, k, nstart=50,iter.max = 20 )$tot.withinss})
+wss
+plot(1:k.max, wss,
+     type="b", pch = 19, frame = FALSE, 
+     xlab="Number of clusters K",
+     ylab="Total within-clusters sum of squares")
+```
+
+```{r}
+data = model.matrix(~Gender+Age+Occupation+City_Category+Marital_Status+Stay_In_Current_City_Years,data = demo)
+
+scaled_data = scale(data,scale=FALSE)
+k.max <- 15
+wss <- sapply(1:k.max, 
+              function(k){kmeans(scaled_data, k, nstart=50,iter.max = 20 )$tot.withinss})
+wss
+plot(1:k.max, wss,
+     type="b", pch = 19, frame = FALSE, 
+     xlab="Number of clusters K",
+     ylab="Total within-clusters sum of squares")
+
+seg.summ <- function(data, groups) {
+  aggregate(data, list(groups), function(x) mean(as.numeric(x))) 
+}  
+set.seed(96743)        
+seg.k3 <- kmeans(scaled_data, centers=3)
+
+seg.summ(data, seg.k3$cluster)
+
+seg.k4 <- kmeans(scaled_data, centers=4)
+
+seg.summ(data, seg.k4$cluster)
+```
+
+```{r}
+demo$Cluster = seg.k4$cluster
+demo
+```
+
+
