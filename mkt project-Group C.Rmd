@@ -6,12 +6,12 @@ output: word_document
 
 **1. Introduction** 
 
-The dataset here is a sample of the transactions made in a retail store during “Black Friday.” The store wants to gain a better understanding about customer purchase behavior compared to different products. This is useful for the company to make purchasing decisions for the next year.
+Every year in America, there is one day where retail stores make the most money. In fact, stores made over $5 billion online from customers on this day in 2017[^1]. This date is always the day after Thanksgiving, and it's called "Black Friday." In our dataset, a particular company wants to gain a better understanding about customer purchasing behavior, because Black Friday is the most profitable day of the year. The company also aims to compare different products to see which ones customers are buying more, and also the demographics of the customers. Having this information could be useful for marketing so that they can target particular customer segments for particular products, and also affect company purchasing decisions for the next year. 
 
-In this project, we want to:  
-* Look at the distribution of customer demographics
-* Determine which variables are highly correlated with purchase
-* Identify which products are high-selling
+In this project, we aim to:</br>  
+* Look at the distribution of customer demographics</br>
+* Determine which variables are highly correlated with purchase</br>
+* Identify which products are high-selling</br>
 
 The dataset comes from a competition hosted by Analytics Vidhya.
 
@@ -56,7 +56,7 @@ In this part, we wanted to see the type of variables for later use (group_by). W
 ```{r results='hide',message=FALSE, warning=FALSE}
 BF[1:11] = lapply(BF[1:11], factor)
 ```
-The majority of the variables were either integers or characters. We decided to coerce the variables into factors (all except purchase) because the majority of them are categorical, and coercing to factors makes for easier and clearer analysis (group_by).
+The majority of the variables were either integers or characters. We decided to change the variables into factors (all except purchase) because the majority of them are categorical, and coercing to factors makes for easier and clearer analysis (group_by).
 
 **Step 4. Tidy the data**
 ```{r results='hide',message=FALSE, warning=FALSE}
@@ -67,7 +67,7 @@ demo = BF %>%
   mutate(Purchase = sum(Purchase))
 demo = demo[!duplicated(demo$User_ID), ]
 ```
-Because we decided to focus more on customer analysis instead of the product, and that Product Category 2 and Product Category 3 have a lot of missing data, we deleted all of the product category columns to make a clearer customer data set. Moreover, we found that the Customer IDs were repeated many times which is redundant and we needed a purchase sum. Therefore, we used customers’ whole purchase amount to replace the individual product purchase and deleted the redundant customer IDs. 
+Because we decided to focus more on customer analysis instead of the product, and that Product Category 2 and Product Category 3 had a lot of missing data, we deleted all of the product category columns to make a clearer customer data set. Moreover, we found that the Customer IDs were repeated many times which is redundant and we needed a purchase sum. Therefore, we used customers’ whole purchase amount to replace the individual product purchase and deleted the redundant customer IDs. 
 
 **3. Summary statistics and Data Visualizations** 
 **Customer Demographics**   
@@ -200,3 +200,5 @@ In terms of a business perspective, it would be wise for the company to analyze 
 From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and interestingly, that there was not a huge difference in mean purchase by age (26-35 category spends slightly more). Also interestingly, there is almost no perceivable difference in mean purchase by years in city.
 
 By using statistical tests and visualizations, we are able to easily pinpoint particular demographics on which the company should direct its marketing dollars. Further analysis will illuminate these important demographics.
+
+[^1]: American shoppers spent a record $5 billion in 24 hours. That marks a 16.9% increase in dollars spent online compared with Black Friday 2016. “Online Sales Boomed on Black Friday.” CNNMoney, Cable News Network, money.cnn.com/2017/11/25/news/black-friday-holiday-shopping-foot-traffic/index.html.
