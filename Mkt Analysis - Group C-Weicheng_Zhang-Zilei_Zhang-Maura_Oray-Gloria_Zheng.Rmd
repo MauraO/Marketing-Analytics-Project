@@ -303,45 +303,77 @@ pairwise.t.test(demo$Purchase, demo$Stay_In_Current_City_Years, p.adjust.method 
 
 The boxplot of stay in current city years exhibited highly similar patterns for each subgroup. Therefore, we were interested in testing the relationship between stay in a certain city with Black Friday purchase amounts at the population level. Stay was a factor variable with 5 categories and purchase was a continuous variable, so we used analysis of variance (ANOVA), which is the extesion of the t-test and can be used to test whether there are significant differences in more than 2 population means (Ralph, 2010). However, since ANOVA does not tell how the mean of one population's group is different than the others, we still needed to use a pairwise t-test. A pairwise t-test enabled us to compare multiple groups' means with the correlation pairwisely. The p-value table showed that the differences in average purchase amounts were not significantly different regardless of how long the customer had been living there. We deduced this because the all the p-values were greater than 0.05. Therefore, we concluded that stay in current city years did not influence customers' purchasing behavior on Black Friday.
 
-**Conclusion**
+**5. Regressions**
 
-From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and interestingly, that there was not a huge difference in mean purchase by age (26-35 category spends slightly more). Also interestingly, there was almost no perceivable difference in mean purchase by years in city. For the marital status, its effect on purchase was ambiguous. Based on the current data, we cannot confidentially say that there exists difference between married and unmarried customers. We need more data to analyze this problem later.
+a. The baseline regression model: nonlinear regression model.We decided to use the nature logarithm of Y as an example of nonlinear regresion model. We wanted to examine the purchase gap between gender, age, occupation, city, the years of staying in the city,and the marital status. It is easier to compare purchase gaps when they are expressed in percentage terms.
 
-By using statistical tests and visualizations, we were able to easily pinpoint particular demographics on which the company should direct its marketing dollars. Further analysis will illuminate these important demographics.
+b. Dependent variable Y: log(purchase) 
+   Independent variable x: gender -dummy varible
+                           age-dummy vairable
+                           occupation-dummy variable
+                           city category-dummy variable
+                           stay_in_current_city_years-dummy variable
+                           marital status-dummy variable
+c. We used overall expenditure for each distinct User_ID. We used the cleaned data we did above which is data "demo". The data "demo"" is data aggregation which we looked at overall expenditures for individual user. We used customers’ whole purchase amount to replace the individual product purchase.
 
+The below is the simple nonlinear regression model for each independent variable.
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}                          
 lm_gender=lm(log(Purchase)~Gender,data=demo)
 summary(lm_gender)
+```
+### Explnation: We run a regression of log purchase on the dummy variable signifying the difference between male and female. We found when the individaul is male compared to when indinvidal is female, the individual purchase amount increase significanly by 27.49% at 99.99% significant level.
 
+```{r, echo=TRUE, message=FALSE, warning=FALSE} 
 lm_age=lm(log(Purchase)~Age,data=demo)
 summary(lm_age)
-
+```
+### Explnation: We run a regression of log purchase on the dummy variable signifying the difference between different age range. We found when the individaul is 18-25 compared to when indinvidal is 0-17, the individual purchase amount increase significanly by 26.49% at 99.99% significant level.The individaul is 26-35 compared to when indinvidal is 0-17, the individual purchase amount increase significanly by 39.51% at 99.99% significant level.The individaul is 36-45 compared to when indinvidal is 0-17, the individual purchase amount increase significanly by 27.47% at 99.99% significant level.The individaul is 46-50 compared to when indinvidal is 0-17, the individual purchase amount increase significanly by 17.32% at 99% significant level.The individaul is 51-55 compared to when indinvidal is 0-17, the individual purchase amount increase significanly by 16.52% at 99% significant level.The individaul is 55+ compared to when indinvidal is 0-17, the individual purchase amount decrease significanly by 14.25% at 95% significant level.
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 lm_occupation=lm(log(Purchase)~Occupation,data=demo)
 summary(lm_occupation)
+```
+### Explnation: We run a regression of log purchase on the dummy variable signifying the difference between different occupation. We found when the individaul is occupation1 compared to when indinvidal is occupation0, the individual purchase amount decrease significanly by 10.12% at 95% significant level.The individaul is occupation 9 compared to when indinvidal is occupation 0, the individual purchase amount decrease significanly by 38.20% at 99.99% significant level.The individaul is occupation 10 compared to when indinvidal is occupation 0, the individual purchase amount decrease significanly by 27.65% at 99.99% significant level.The individaul is occupation13 compared to when indinvidal is occupation 0, the individual purchase amount decrease significanly by 45.28% at 99.99% significant level.
 
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 lm_citycategory=lm(log(Purchase)~City_Category,data=demo)
 summary(lm_citycategory)
+```
+### Explnation: We run a regression of log purchase on the dummy variable signifying the difference between different city categories. We found when the individaul is in city B compared to when indinvidal is in city A, the individual purchase amount increase significanly by 10.34% at 99.9% significant level.The individaul is in city C compared to when indinvidal is in city A, the individual purchase amount decrease significanly by 62.09% at 99.99% significant level.
 
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 lm_stayincityyears=lm(log(Purchase)~Stay_In_Current_City_Years,data=demo)
 summary(lm_stayincityyears)
-
-
-lm_marital=lm(log(Purchase)~Marital_Status,data=demo)
-summary(lm_marital)
-
-lm_multiple=lm(log(Purchase)~Gender+Age+Occupation+City_Category+Stay_In_Current_City_Years+Marital_Status
-+Gender,data=demo)#multiple linear regression 
-
-lm_multiple=lm(log(Purchase)~Gender+Age+Occupation+City_Category+Stay_In_Current_City_Years+Marital_Status
-+Gender*Marital_Status+City_Category*Stay_In_Current_City_Years+Occupation*City_Category,data=demo)#double check this one
-
-summary(lm_multiple)
-anova(lm_multiple)
 ```
 
-Regression explanation: Gloria
+### Explnation: We run a regression of log purchase on the dummy variable signifying the difference between different years staying in current city. We found in 95% significant level, stay_in_current_city_years are not significantly influence the percentage change in purchae amount.
 
-- Need to finish e & f 
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+lm_marital=lm(log(Purchase)~Marital_Status,data=demo)
+summary(lm_marital)
+```
+### Explnation: We run a regression of log purchase on the dummy variable signifying the difference between married and unmarried. We found when the individaul is married compared to when indinvidal is unmarried, the individual purchase amount decrease significanly by 4.70% at 95% significant level.
+
+d. Then we do the multiple nonlinear regresion model.
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+lm_multiple=lm(log(Purchase)~Gender+Age+Occupation+City_Category+Stay_In_Current_City_Years+Marital_Status
++Gender,data=demo)
+summary(lm_multiple)
+```
+### Explanation: We run a regression of log purchase on all the independent variables together. We found at 99.99% significance level, holding all the other variables constant when the individual is male,the individual purchase amount increase 29.00%; holding all the other variables constant when the individual is in city C,the individual purchase amount decrease 58.80%. At 99.9% significance level, holding all the other variable constant, when the individual is in city B, the individual purchase amount increase 11.34%. At 99% significance level, holding all the other variable constant, when the individual is in occupation 7, the individual purchase amount decrease 10.70%.
+
+d. From the results of individual and multiple nonlinear regression, we found these variables (gender, city_Category) significantly influence the percentage change in purchase. Men have a significantly influence in  increasing purchase amount. So from this we can predict, men have a large influence in increasing purchasing power. Individual living in city C has a significanly influence decreasing in purchase amount. So from this we can predict that individual in city has significantly decreasing purchasing power (or no puchasing power).
+
+e. The omittied variable biaas is the variable which we didn't count in the above analysis which can influence dependent variable log(purchase) and is also correlated with the independent variables. So the ommited variabel can be "annual salary" which can influence individul in changing in purchase, and also is correlated with occupation. The other omitted varibel can be "ethnicity", which is also influence the dependent variable, and is also correlated with occupation or city_category. However, we don't have enough data for these variables, which we can't do regression on this. Moreover, the above regresion model is showing the effect on log purchase of one independet variable, holding other variables constant. The limitation of this is the effect of marital status in this specification, holding constnat gender, is the same for men and women. However, no reason that this must be so. The effect on percentage change in purchase amount of marital stautus holding gender constant, could depende on the difference of the gender. So the interaction term is also an example of control variable. The definition of control variable is that it is correlated with omitted causal factor, but it does not necessarily have a cauasl effect on dependent variable. We decide to use put interaction term of gender and marital_stauts, the interaction term of city category and years staying in the city in our new regression equation as control variables.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+lm_omitted=lm(log(Purchase)~Gender+Age+Occupation+City_Category+Stay_In_Current_City_Years+Marital_Status
++Gender*Marital_Status+City_Category*Stay_In_Current_City_Years,data=demo)
+
+summary(lm_omitted)
+
+```
+
+Explanation: We run a regression of log purchase on all the independent variables and the control variables together. We find at 99.99% significance level, holding all the other variables constant when the individual is male,the individual purchase amount increase 30.73%; holding all the other variables constant when the individual is in city C,the individual purchase amount decrease 72.20%. At 99.9% significance level, holding all the other variable constant, when the individual is in age 26-35, the individual purchase amount increase 27.38%. At 99% significance level, holding all the other variable constant, when the individual is living in city C and stay in more than 4 years, the individual purchase amount increase 12.08%. The R sqare change from 0.1514 to 0.1542. So from this, the higher R square means that the regressors with control variables explain the variation in log(purchase) bettwen than just without. From both regression equations, we interpret that male individual has signifcantly increasing purchaing power, and city C has significantly devreasing purchasing power.
 
 **6. Segmentation**
 ```{r}
@@ -379,5 +411,10 @@ demo
 
 Explanation
 
-Conclusion 
+**Conclusion**
 
+From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and interestingly, that there was not a huge difference in mean purchase by age (26-35 category spends slightly more). Also interestingly, there was almost no perceivable difference in mean purchase by years in city. For the marital status, its effect on purchase was ambiguous. Based on the current data, we cannot confidentially say that there exists difference between married and unmarried customers. We need more data to analyze this problem later.
+
+By using statistical tests and visualizations, we were able to easily pinpoint particular demographics on which the company should direct its marketing dollars. Further analysis will illuminate these important demographics.
+
+[^1]: American shoppers spent a record $5 billion in 24 hours. That marks a 16.9% increase in dollars spent online compared with Black Friday 2016. “Online Sales Boomed on Black Friday.” CNNMoney, Cable News Network, money.cnn.com/2017/11/25/news/black-friday-holiday-shopping-foot-traffic/index.html.
