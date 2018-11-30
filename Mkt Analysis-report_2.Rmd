@@ -115,7 +115,8 @@ demo %>%
     scale_fill_discrete(labels=c("Unmarried", "Married"))
 ```
 We were interested in determining which occupations spend more and whether married customers spend more than unmarried customers. Since marital status and occupation are factors (discrete) variables, and purchase is a continuous variable, we used a barplot to show total purchase for each occupation, split by matital status. Without looking at the marital status, this barplot shows the purchase distribution among 21 occupations and can answer questions such as "How much do customers from occupation x spend on Black Friday?" Taking into account marital status, the plot answers whether married or unmarried customers spend more. We improved the plot by flipping the coordinates and reordering the purchase by occupation in ascending order.
- Generally, unmarried customers spend more on Black Friday and this holds true for most occupations. Specifically, occupations 17, 1, 7, 0 and 4 spend the most money, over $2 trillion, out of which occupation 4 purchases the most. Interestingly, for occupation 10, married customers hardly spend money on Black Friday.  
+
+Generally, unmarried customers spend more on Black Friday and this holds true for most occupations. Specifically, occupations 17, 1, 7, 0 and 4 spend the most money, over $2 trillion, out of which occupation 4 purchases the most. Interestingly, for occupation 10, married customers hardly spend money on Black Friday.  
 
 **Visualization 4. Purchase Distribution by Age**
 ```{r message=FALSE, warning=FALSE}
@@ -149,7 +150,7 @@ BF %>% group_by(Product_Category_1) %>%
   
 ```
 
-The assumptions here were that the quantity of distinct products within a certain category lead to popularity of this category and cheaper products have more substitutes. To verify our aforementioned guess, we came to the question that how many products are contained in each category. So we plot the quantity of  distinct products on the vertical axis. The output showed that category  8  stored the most products, followed by category 5 and 1. Now we saw why categories 1, 5 and 8 were so popular!
+The assumptions here were that the quantity of distinct products within a certain category lead to popularity of this category and cheaper products have more substitutes. To verify our aforementioned guess, we came to the question that how many products are contained in each category. Therefore, we plotted the quantity of distinct products on the vertical axis. The output showed that category 8 stored contained the most products, followed by category 5 and 1. Now we saw why categories 1, 5 and 8 were so popular!
 
 **Visualization 7. The Number of Customers in Product Category**
 ```{r}
@@ -161,9 +162,9 @@ BF %>% group_by(Product_Category_1) %>%
   labs(x ="Product Category 1" , y = "Number of Customers", title = "Number of Customers VS Product Category 1")
   
 ```
-We were also interested in the customer distribution against product category, i.e.,  how many  distinct customers have ever bought from a specific category? The number of distinct customers were counted for each category and plotted as y variable. The plot showed that categories 1,5 and 8 were still the three categories that had the most visits.
+We were also interested in the customer distribution versus product category, i.e., how many distinct customers have bought from a specific category. The number of distinct customers were counted for each category and plotted as the y variable. The plot showed that categories 1,5 and 8 were still the three categories that had the most visits.
 
-Bases on the series of plots, our conclusion is that the 3 most popular product categories have the most product items and customers.  
+Bases on the series of plots, our conclusion is that the three most popular product categories have the most product items and customers.  
 
 **Visualization 8. The Most Profitable Product Category**  
 
@@ -189,9 +190,9 @@ t.test(demo[demo$Gender == "M", ]$Purchase,
        alternative = "greater")
 ```
 In the above code, we wanted to determine whether gender influences purchase. In table 1 and plot 2, we find that there are more men than women and that men make more purchases than women. Because gender is discrete and purchase is continuous, we chose to apply a t-test to determine whether there is a difference between men and women in purchase.  
+
 Based on the evidence from this data set and the result from the t-test (p-value < 2.2e-16), we rejected the null hypothesis and accepted the alternative hypothesis: that men have a larger mean purchase amount than women.  
 From the statistical analysis, we recommend that the store should focus more on men because they have higher purchasing power than women and for the store to have more methods of promotion towards men in order to increase their revenue.
-
 
 **Test 2. Do unmarried customers spend more money on Black Friday than married?**
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
@@ -252,14 +253,14 @@ The boxplot of stay in current city years exhibited highly similar patterns for 
 
 **5. Regression Analyses**  
 
-**a. The baseline regression model:**  
-In part 4, we figured out gender, city and age are three significant factors, and marital status is a marginal significnat one. Therefore, we used the first three as the first baseline regressors and built our model.  
+**a. The Baseline Regression Model:**  
+In part 4, we determined that gender, city, and age are three significant factors in purchase, and that marital status is marginally significant. Therefore, we used the first three variables as the first baseline regressors and built our model.  
 
-**b. Dependent and Independent variables**  
-The dependent variable in our model is log(purchase), and independent variables are: gender, age, city category. Since all the demographic regressors are categorical variables, logarithm of purchase amount can better tell percentage change for different group of customers.
+**b. Dependent and Independent Variables**  
+The dependent variable in our model is log(purchase), and independent variables are: gender, age, city category.  
                            
 **c. Data Aggregations**  
-We used overall expenditure for each distinct User_ID. The cleaned data we did above which is data "demo". The data "demo" is data aggregation which we looked at overall expenditures for individual user. We used customers’ whole purchase amount to replace the individual product purchase.  
+We used total purchase amounts for each distinct User_ID. The cleaned data set "demo" (as shown previously) is the data aggregation where we looked at overall expenditures for each customer. We then used customers’ total purchase to replace the individual product purchase.  
 
 **d. Results of the Regression**  
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
@@ -267,13 +268,14 @@ lm_multiple_1=lm(log(Purchase)~Gender+Age+City_Category,data=demo)
 summary(lm_multiple_1)
 confint(lm_multiple_1)
 ```  
-The output of baseline regression model shows that gender, age and city category have significant effect on purchase amount.
-Male customers would purchase 28.3% more than female customers; customers aged from 26-35 would buy most on Black Friday, followed by cutomers in age range 36-45 and 45-50; customers from city B would purchase the most, followed by customers from city A and C. Due to the low R square coefficient, we focus more on the qualitative analysis rather than interpreting the coefficients of regressors.  
+The output of the baseline regression model shows that gender, age and city category have a significant effect on purchase amount.
 
-**e.Analyzing Controlling for omitted variable biases**  
-The definition of omitted variable is that: (1) the omitted variavle is correlated with the included regressors and (2) the omitted variable is a determinent of the dependent variable. To verify the presence of omitted variable biases, we add one more unincluded variable one time to see if aforementioned effects would happen. The variable we add is used as the control, which can be defined as omitted variable if it significantly differs with 0 and and affect coefficient of other regressors.  
+Men purchase 28.30% on Black Friday than women; customers aged from 26-35 buy the most on Black Friday, followed by cutomers in the age ranges 36-45 and 45-50; customers from city B purchase the most followed by customers from city A and then C. Due to the low R square coefficient (0.1458), we decided to focus more on the qualitative analysis rather than interpreting the coefficients of the regressors.  
+
+**e. Analyzing Controlling for omitted variable biases** 
+The definition of an omitted variable is that: (1) the omitted variable is correlated with the included regressors and (2) the omitted variable is a determinant of the dependent variable. To verify the presence of omitted variable biases, we added one more non-included variable to see if the aforementioned effects would occur. The variable we added is used as the control, which can be defined as the omitted variable if it significantly differs with 0 and affects the coefficients of other regressors.  
  
-First, we added marital status as the control variable and re-do the regression 1.  
+Firstly, we added marital status as the control variable and re-performed the original regression:    
 ```{r}
 lm_multiple_2=lm(log(Purchase)~Gender+Age+City_Category+Marital_Status,data=demo)
 summary(lm_multiple_2)
@@ -286,17 +288,17 @@ Second, we added "stay_in_current_years" as the control variable and re-do the r
 lm_multiple_3=lm(log(Purchase)~Gender+Age+City_Category+Stay_In_Current_City_Years,data=demo)
 summary(lm_multiple_3)
 ```
-Again, although the values of coefficients of the regressors changed slightly, the variable "stay_in_current_years" is not significant in this mode. Moreover, the R-square hardly changed. Therefore, we can draw the conclusion that the marital status is not an omitted variable, for it had no influence on the other regressors and the dependent variable.  
+According to the result, we found that the marital status is not significant in this model. In other words, marital status is not a determinent of log(Purchase). Moreover, the R-square value had no change, meaning that marital status does not explain the variance in the dependent variable. Therefore, we could say that marital status is not an omitted variable. 
 
-Lastly, we added occupation as the third control variable, and re-do the regression_1. 
+Secondly, we added "stay_in_current_years" as the control variable and re-performed the original regression:
 ```{r}
 lm_multiple_4=lm(log(Purchase)~Gender+Age+City_Category+Occupation,data=demo)
 summary(lm_multiple_4)
 ```
-Compared with result of regression 1 , we found that some occupations (3,6,7,13,16,17,19) are significant at 10% significance level. That is to say, occupation is correlated with purchase amount  to some degree. More importantly, customer aged from 18-25 and 46-50 are not marginally significant as before. Occupation is also correlated with age in some sense. Therefore, occupation is an omitted variable. This can be also approved by the increase in R square, from 0.1458 to 0.1512.  
+Compared with the result of the original regression, we found that some occupations (3,6,7,13,16,17,19) are significant at the 90% significance level. That is to say, occupation is correlated with purchase amount to some degree. More importantly, customers aged from 18-25 and 46-50 are not as marginally significant as previously stated. Occupation is also correlated with age in some sense, so we can say that occupation is an omitted variable. This is also cemented by the increase in the R-square value, from 0.1458 to 0.1512.  
 
-**f.**  
-Another data aggregation level we used to do regressions is user-product category level. The purcahse amount of products in the same category was aggregated for each customer. The purchase amount in user level is customer specific while at user-category level the purchase amount is customer and product categoory specific. At this data aggregation level we can answer questions from a more specific perspective: given a certain product category, how does  demographic factors affect the purchase amount; which category does man/ customer from city A/ customer aged from 18-25 purchase more? Or given a category which group of customers bought more.
+**f. Additional Data Aggregations**
+Another data aggregation level we used to do regressions is the user-product category level. The product purchase amount in the same category was aggregated for each customer. The purchase amount at the user level is customer-specific while at user-category level the purchase amount is customer and product category specific. At this data aggregation level we can answer questions from a more pointed and directed perspective: given a certain product category, how do demographic factors affect the purchase amount? Which product category do men from city A aged from 18-25 purchase more? Or given a particular category, which group of customers bought more?
 
 
 ```{r}
@@ -312,17 +314,18 @@ summary(re_f)
 
 
 ```
-Product category 5 is a popular category so we take it as an example. The result shows that customers who are older than 55 purchased significant less than customers in other age ranges, and customer who are from city C spent less on this category than their counterparts.
+We took product category 5 as an example because it was a popular category. The result shows that customers who are older than 55 purchased significantly less than customers in other age ranges, and that customers who are from city C spent less money in this category than their counterparts.
 
-product category 9 is a really interesting product category. The output shows that all the demographic regressors are not significant. The interpretation is that no matter which city the customer are from, whether the customers are young or old or whether they are male or female, there is no significant difference on purchase amount for this category. Therefore, we assumed that it may be a basic necessity of life for which all the customers have similar needs. 
+We were also interested in product category 9. The output shows that all the demographic regressors are not significant. We interpreted this as that regardless of their origin city, or whether they are young or old or male or female, there is no significant difference in purchase amount for this category. Therefore, we assumed that this product could be a basic necessity that all customers would buy, such as a toothbrush or toothpaste. 
 
 **6. Segmentation:**  
-**a.**  
-The final model we used for segmentation is regressing log(Purchase) on age, gender, city and occupation. In other words, we can segment customers into male customers and female customers; or we can segment customers based on their age ranges; or we can segment customers based on their resident cities; or we can segment customers based on their occupations.  
-Qualitatively, male segment purchased significanly more than female segment; customers in age range 26-35 is the segment that spent most on Black Friday, follwed by customer aged from 36-45 and the segment composed of all the rest customers; customers from city B was the top 1 segment in terms of purchase amount, followed by customers from city A and C; top 3 segments in terms of occupation were occupation 19, 3 and 16.
 
+**a. Demographics**
+The final model we used for segmentation regressed log(Purchase) on age, gender, city and occupation. From this, we could segment customers into men and women, age range, origin city, or occupation.  
 
-**b.**  
+As mentioned previously, we found that men purchased significanly more than women during Black Friday; customers in the age range 26-35 spent the most on Black Friday, followed by customers aged 36-45; customers from city B spent the most in terms of city category; and the top 3 segments in terms of occupation were occupations 19, 3 and 16.
+
+**b. Post-Hoc Segmentation** 
 ```{r message=FALSE, warning=FALSE}
 # Expand factors into a set of dummy variables
 data = model.matrix(~Gender+Age+Occupation+City_Category+Marital_Status+Stay_In_Current_City_Years,data = demo)
@@ -351,11 +354,12 @@ library(cluster)
 clusplot(demo, seg.k4$cluster, color=TRUE, shade=TRUE, 
          labels=4, lines=0, main="K-means clust")
 ```
-Above is a plot of sum of squared distance for k in range 1-15. The plot look like an arm and its 'elbow' gives the optimal number of clusters, which in this dataset is 4. The 4 segments differ in age, occupation, city category, marital status and stay years in current city.  
-* Cluster 1: Customers in this group who were exclusively from city C had the lowest purchase amount on Black Friday. Most customers are male (71.69%), aged from 18 to 45 (64%) and resident in current city for less than 1 year (64%). They were almost evenly distributed in terms of marital status.  
-* Cluster 2: Customers in this group had the second lowest purchase amount on Black Friday. The majority of them are male (71.35%) and unmarried (58%), aged from 18 to 45 (77%). All customers had stayed in current city for 2 years and most come from city C (54.15%), followed by city B (29.87%) and city A (15.98%).  
-* Cluster 3: Customers in this group purchased second most on Black Friday. Most customers are male (72.74%) and married (80.85%). And they are young, i.e., two thirds were aged from 26-35. Roughly half of total customers were from city A and most (72) had stayed in current city over 3 years.  
-* Cluster 4: Customers in this group bought most on Black Friday. Most customers are male (71%), aged from 18 to 45 (71%), from in city B (75%) and resident in current city for less than 1 year (88%). They were almost evenly distributed in terms of marital status.  
+The above code shows a visualization of the sum of squared distance for k in range 1-15. The 'elbow' of the visualization shows the optimal number of clusters, which in this dataset is 4. The 4 segments differ in age, occupation, city category, marital status and stay in current city years.
+
+* Cluster 1: Customers in this group who were from city C had the lowest purchase amount on Black Friday. Most customers were male (71.69%), aged 18-45 (64%) and were a resident in their current city for less than 1 year (64%). They were almost evenly distributed in terms of marital status.  
+* Cluster 2: Customers in this group had the second lowest purchase amount on Black Friday. The majority of them were male (71.35%) and unmarried (58%), aged from 18-45 (77%). All customers had been in their current city for 2 years and most were from city C (54.15%), followed by city B (29.87%) and city A (15.98%).  
+* Cluster 3: Customers in this group spent the second most on Black Friday. Most customers were male (72.74%) and married (80.85%). They are also young, i.e., two thirds were aged 26-35. Roughly half of total customers were from city A and most (72) had been in their current city for over 3 years.  
+* Cluster 4: Customers in this group bought the most on Black Friday. Most customers were male (71%), aged 18-45 (71%), from city B (75%) and had been living in their current city for less than 1 year (88%). They were almost evenly distributed in terms of marital status. 
 
 **Regression after Segmentation**  
 ```{r}
@@ -364,22 +368,33 @@ demo$Cluster = seg.k4$cluster
 cluster_multiple=lm(log(Purchase)~Gender*Cluster+Age*Cluster+Occupation*Cluster+Stay_In_Current_City_Years*Cluster+Marital_Status*Cluster,data=demo)
 summary(cluster_multiple)
 ```
+In cluster 1 where customers came from city C, male customers spent 23.3% more than female customers. Customers aged 26-35 bought the most, 31% more than customers under 17 years old, followed by those who were in the age range 46-50 and 51-55 (at the 90% significance level). We also found that people in occupation 6 and 7 purchased significantly less than those in occupation 0.  
+ 
+In cluster 2 where all customers were new in their current city, men spent 32.3% more than women customers. There was no difference in purchase among various age ranges. Only occupation 13 spent significantly less (53%) than occupation 0. It is noticeable that, customers from city B purchased marginally (14.5%) less and customers from city C spent significantly (72.4%) less than customers from city A. We also found that marital status was not correlated with purchase on Black Friday.  
 
-In cluster 1 where customers exclusively come from city C, male customers spent 23.3% more than female customers. Customers aged from 26-35 bought most, 31% more than customers aged under 17, followed by those who are in age range 46-50 and 51-55 (at 10% significance level). Those who have been doing occupation 6 and 7 purchased significantly less than occupation 0. _Marital status has no effect on purchase!_  
+In cluster 3, men spent 39% more than women. Age, marital status and stay in current city years had no effect on the purchase amount on Black Friday. Occupation 19 had the highest purchase amount, followed by occupation 3. Customers from city B spent the most followed by those who came from city A and C.    
 
-In cluster 2 where all customers were new in current city, male customers spent 32.3% more than female customers. There is no difference in purchase among various age ranges. Only Occupation 13 spent significantly less (53%) than occupation 0. It is noticible that, customers from city B purchased marginally (14.5% ) less and customers from city C spent significantly (72.4%) less than customers from city A. Matiral Status was not correlated with purchase on Black Friday.  
+Finally, men in the last cluster bought more than women. Age, marital status, and stay in current city years (at the 95% significance level) did not affect purchase. Customers from city B spent more than customers from city A.  
 
-In cluster 3, male customer spent 39% more than female customers. Age, marital status and stay years in current city had no effect on purchase amount on Black Friday. Occupation 19 had the highest purcahse, followed by occupation 3. Customers from city B spent most followed by those who came from city A and C.  
+In general, marital status is not correlated with purchase amount on Black Friday. Likewise, age has no effect on total spending except in cluster 1.   
 
-Male customers in this clustr bought more than female customers. Age, marital status, and stay years in current years (at 5% significance level) did not affect purchase. Customers from city B spent more than customers from city A.  
-In general, marital status is not correlated with purchase amount on Black Friday. Like wise, age has no effect on total spending except cluster 1.  
+**7. Predictive Model **
+```{r}
+
+#Create validation set
+
+
+
+```
 
 **Conclusion**
 
 From our preliminary data analysis, we were able to determine customer demographics that were associated with higher purchase amounts. In particular, we found that men spend more money on Black Friday than women, the purchase amounts are higher in different cities (City C has higher purchase amounts), unmarried people spend more than married (but only slightly more), certain occupation categories spend more than others, and interestingly, that there was not a huge difference in mean purchase by age (26-35 category spends slightly more). Also interestingly, there is almost no perceivable difference in mean purchase by years in city. For the marital status, its effect on purchase is ambiguous.  
 
-Analysis was further by regressions. Based on previous takeaways, we built a baseline model, which regressed log(purchase) on gender, age and city category. Different with qualitative analysis of statistical tests, regression model output quantitative information about how customer demographics affect purchase amount on Black Friday. However, regressions often suffer from omitted variables biases that have an impact on dependent variable but are not included. To control omitted variable, the rest variables (stay years, marital status and occupation) were added to the baseline regression one by one, holding base regressors  constant each time. Finally, we found that occupation is an omitted variable because some occupations(3,6,7,13,16,17,19) are  statistically significant. The extended regression showed that male customers would purchase significantly more than female customers; customers aged from 26-35 would buy most on Black Friday and customers from city B would purchase the most.  
+By using statistical tests and visualizations, we were able to easily pinpoint particular demographics on which the company should direct its marketing dollars. Further analysis will illuminate these important demographics. 
 
-Customer segmentation provided more insight into customers by grouping customers based on similar characteristics or purchasing behavior, which can be classified as either a priori or post-hoc. The result of a priori segmentation was based on customer demographics characteristics. While post-hoc segmentation segmented customers into 4 clusters. By re-doing regressions for each cluster, we found that marital status is not correlated with purchase amount on Black Friday, which matches the result of regression part; age has no effect on total spending except cluster 1.  
+In the regression section, we found that occupation was an omitted variable and then were able to compile our final regression model. We used four significant factors: gender, age, city category and occupation as the independent variables to figure out the unknown effect on the dependent variable - log(purchase). Based on the result from the final model, we found that certain occupations (3,6,7,13,16,17,19) were correlated with purchase. Moreover, men purchased 28.98% more than women; customers aged 26-35 bought the most on Black Friday and customers from city B also purchased the most. 
 
-After identifying the demographic factors  that have significant effect on purchase amount and distinct purchasing behaviors of different customer segments, there are some managerial takeaways from the data pattern and model results. First, the manager could put their marketing focus on customers who are male, aged from 26-35 and from city B. To put it more specifically, the group of customers characterized by cluster 4 are the target customers. Therefore, this firm could send more emails informing target customers of the recommendation products and promotion information.
+We also clustered the customers into 4 groups by segmentation. Each cluster had specific characteristics. Therefore, we re-performed the final regression and determined customers with specific characteristics who bought the most. Using this method could be highly effective because the company could use the segmentation to clearly pinpoint customer clusters for targeted promotion and marketing.
+
+[^1]: American shoppers spent a record $5 billion in 24 hours. That marks a 16.9% increase in dollars spent online compared with Black Friday 2016. “Online Sales Boomed on Black Friday.” CNNMoney, Cable News Network, money.cnn.com/2017/11/25/news/black-friday-holiday-shopping-foot-traffic/index.html.
