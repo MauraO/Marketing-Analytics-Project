@@ -150,7 +150,7 @@ BF %>% group_by(Product_Category_1) %>%
   
 ```
 
-The assumptions here were that the quantity of distinct products within a certain category lead to popularity of this category and cheaper products have more substitutes. To verify our aforementioned guess, we came to the question that how many products are contained in each category. Therefore, we plotted the quantity of distinct products on the vertical axis. The output showed that category 8 stored contained the most products, followed by category 5 and 1. Now we saw why categories 1, 5 and 8 were so popular!
+The assumptions here were that the quantity of distinct products within a certain category lead to popularity of this category and cheaper products have more substitutes. To verify our aforementioned guess, we came to the question of how many products are contained in each category. Therefore, we plotted the quantity of distinct products on the vertical axis. The output showed that category 8 stored contained the most products, followed by category 5 and 1. Now we saw why categories 1, 5 and 8 were so popular!
 
 **Visualization 7. The Number of Customers in Product Category**
 ```{r}
@@ -166,7 +166,7 @@ We were also interested in the customer distribution versus product category, i.
 
 Bases on the series of plots, our conclusion is that the three most popular product categories have the most product items and customers.  
 
-**Visualization 8. The Most Profitable Product Category**  
+**Visualization 8. Average Expenditure VS Product Category 1**  
 
 ```{r}
 # Average Expenditure VS Product Category 1
@@ -177,7 +177,7 @@ BF %>% group_by(Product_Category_1) %>%
   labs(x ="Product Category 1" , y = "Sum Expenditure", title = "Total Expenditure VS Product Category 1")
   
 ```
-In addition to the number of items and the number of customers of each category, the profitability, measured by sum purchase amount spent on each category, was another concern. So we sumed up the purchased amount for each category and plotted it against each category. The above bar plot showed that the top 3 categories that customers spent most money on total are still category 5,1 and 8. Hence, we came to the conclusion that categories 5,1 and 8，the most popular categories based on previous graph, are still the most profitable categories. 
+In addition to the number of items and the number of customers in each category, the profitability, measured by sum purchase amount spent on each category, was another concern. Therefore, we summed the purchased amount for each category and plotted it against each category. The above bar plot showed that the top 3 categories that customers spent most money on total are still category 5,1 and 8. Hence, we came to the conclusion that categories 5,1 and 8，the most popular categories based on previous graph, are still the most profitable categories. 
 
 **4. Preliminary statistical analyses**  
 
@@ -195,6 +195,7 @@ Based on the evidence from this data set and the result from the t-test (p-value
 From the statistical analysis, we recommend that the store should focus more on men because they have higher purchasing power than women and for the store to have more methods of promotion towards men in order to increase their revenue.
 
 **Test 2. Do unmarried customers spend more money on Black Friday than married?**
+
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 #Independent t-test
 t.test(demo[demo$Marital_Status == 0, ]$Purchase,
@@ -209,6 +210,7 @@ Based on the evidence from this data set and the result from the t-test (p-value
 Because the mean purchase amount was higher for unmarried people than married people, the company's marketing department could focus on targeting single people in order to increase purchase amounts. However, it would be wise not to focus all marketing dollars on single people, since the difference between the mean purchase amount for unmarried versus married is not stark.  
 
 **Test 3. Is there an association between city and purchase?**
+
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 # Mutate a new column
 demo = demo %>% 
@@ -226,6 +228,7 @@ Based on the evidence from this data set and the result from the Chi-Square test
 From a business perspective, it would be wise for the company to analyze which cities are more profitable, so that it can appropriately direct marketing dollars towards either the more profitable or less profitable cities, depending on the marketing campaign.  
 
 **Test 4. Is there an association between Age and purchase?**
+
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 # Chi-Square test
 # Create purchase categories
@@ -281,16 +284,16 @@ lm_multiple_2=lm(log(Purchase)~Gender+Age+City_Category+Marital_Status,data=demo
 summary(lm_multiple_2)
 ```  
 
-According to the result, we found that the marital status is not significant at all in this model. In other word, marital status is not a determinent of log(Purchase). Moreover, the R-square had no change, meaning that marital status can not explain the variance in dependent variable. Therefore, we can draw the conclusion that the marital status is not an omitted variable. 
+According to the result, we found that marital status is not significant in this model. In other word, marital status is not a determinent of log(Purchase). Moreover, the R-square had no change, meaning that marital status can not explain the variance in dependent variable. Therefore, we can draw the conclusion that the marital status is not an omitted variable. 
 
-Second, we added "stay_in_current_years" as the control variable and re-do the regression_1.
+Secondly, we added "stay_in_current_years" as the control variable and re-performed the regression:
 ```{r}
 lm_multiple_3=lm(log(Purchase)~Gender+Age+City_Category+Stay_In_Current_City_Years,data=demo)
 summary(lm_multiple_3)
 ```
-According to the result, we found that the marital status is not significant in this model. In other words, marital status is not a determinent of log(Purchase). Moreover, the R-square value had no change, meaning that marital status does not explain the variance in the dependent variable. Therefore, we could say that marital status is not an omitted variable. 
+According to the result, we found that stay in current city years is not significant in this model. In other words, stay in current city years is not a determinant of log(Purchase). Moreover, the R-square value had no change, meaning that stay does not explain the variance in the dependent variable. Therefore, we could say that marital status is not an omitted variable. 
 
-Secondly, we added "stay_in_current_years" as the control variable and re-performed the original regression:
+Next, we added "Occupation" as the control variable and re-performed the original regression:
 ```{r}
 lm_multiple_4=lm(log(Purchase)~Gender+Age+City_Category+Occupation,data=demo)
 summary(lm_multiple_4)
